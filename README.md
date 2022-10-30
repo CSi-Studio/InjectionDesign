@@ -4,9 +4,6 @@ Metabolomics Injection System
 # User Manual
 [MetaIn User Manual.pdf](https://github.com/CSi-Studio/MetaIn/files/9895377/MetaIn.User.Manual.pdf)
 
-# Framework of MetaIn
-![image](https://user-images.githubusercontent.com/13608335/198868774-91072510-b736-4dc5-b2ed-ba30bafd245c.png)
-
 
 ---
 
