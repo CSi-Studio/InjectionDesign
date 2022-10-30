@@ -27,14 +27,14 @@ Metabolomics Injection System
 
 ## How to install
 
-> Extract MetaPro zip file to any directory you want.
+> Extract MetaIn zip file to any directory you want.
 
 > Here we use INSTALLATION_PATH to represent your installation path, for example `C:\`
 
 ### Windows
 
 - Open INSTALLATION_PATH folder
-- **start:** Right click `MetaproStart.bat`, run as administrator.
+- **start:** Right click `MetaInStart.bat`, run as administrator.
 
   **Successful operation:**
 
@@ -71,7 +71,7 @@ Metabolomics Injection System
   /Users/commands/Documents/code/MetaIn/MetaIn/redis
   ********* Start MongoDB *********
   /Users/commands/Documents/code/MetaIn/MetaIn/mongodb
-  ********* Start Metapro *********
+  ********* Start MetaIn *********
   about to fork child process, waiting until server is ready for connections.
   forked process: 94332
 
