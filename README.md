@@ -10,7 +10,7 @@ Metabolomics Injection System
 
 ## Demo
 
-[`MeteIn online`](#http://112.124.50.186/)
+[`MeteIn online`](http://112.124.50.186/)
 
 ---
 
