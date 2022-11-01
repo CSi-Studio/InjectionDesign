@@ -15,6 +15,12 @@ Metabolomics Injection System
 
 ---
 
+## TEST DATA
+Test Sample Data: [testSample.xlsx](https://github.com/CSi-Studio/MetaIn/files/9907280/T1._.xlsx), users can download and upload in the sample management page.
+Test WhiteList Data: [whilteListSampleData.xlsx](https://github.com/CSi-Studio/MetaIn/files/9907288/-light.xlsx) , users can download and upload when creating a whiteList worksheet in pretreatment of the project management page.
+Test Standrand Product Data:  [StandrandProductData.xlsx](https://github.com/CSi-Studio/MetaIn/files/9907297/-.xlsx)
+
+
 ## Download
 
 ### Software
