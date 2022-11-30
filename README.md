@@ -1,5 +1,5 @@
-# MetaIn
-Metabolomics Injection System
+# InjectionPro
+LC/GC-MS-based Multi-Omics Plate Design Web Service
 
 # User Manual
 [MetaIn User Manual.pdf](https://github.com/CSi-Studio/MetaIn/files/9905913/MetaIn.User.Manual.pdf)
