@@ -1,86 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Card, Pagination, Space, Table} from "antd";
-import {ColumnsType} from "antd/es/table";
-import {date2str} from "@/utils/date";
-import {exportToCsv} from "@/utils/export";
 import {DownloadOutlined, PrinterOutlined} from "@ant-design/icons";
 import {jsPDF} from "jspdf";
 import RunTemplateService from "@/services/RunTemplateService";
-
-export interface TableDataType {
-  key: React.Key;
-  firstName: string;
-  lastName: string;
-  birth: Date;
-}
-
-
-const columns: ColumnsType<TableDataType> = [
-  {
-    title: 'SampleName',
-    dataIndex: 'sampleNo',
-    key: 'firstName',
-  },
-  {
-    title: 'SampleID',
-    dataIndex: 'lastName',
-    key: 'lastName',
-  },
-  {
-    title: 'InjectionOrder',
-    dataIndex: 'lastName',
-    key: 'lastName',
-  },
-  {
-    title: 'Comments',
-    dataIndex: 'birth',
-    key: 'birth',
-    render: birth => date2str(birth),
-  },
-  {
-    title: 'AcqMethod',
-    dataIndex: 'lastName',
-    key: 'lastName',
-  },
-  {
-    title: 'AcqMethod',
-    dataIndex: 'lastName',
-    key: 'lastName',
-  },
-  {
-    title: 'ProcMethod',
-    dataIndex: 'lastName',
-    key: 'lastName',
-  },
-  {
-    title: 'RackCode',
-    dataIndex: 'lastName',
-    key: 'lastName',
-  },
-  {
-    title: 'PlateCode',
-    dataIndex: 'lastName',
-    key: 'lastName',
-  }, {
-    title: 'VialPos',
-    dataIndex: 'lastName',
-    key: 'lastName',
-  },
-
-  {
-    title: 'SmplInjVol',
-    dataIndex: 'birth',
-    key: 'birth',
-    render: birth => date2str(birth),
-  },
-  {
-    title: 'DilutFact',
-    dataIndex: 'birth',
-    key: 'birth',
-    render: birth => date2str(birth),
-  }
-];
-
 
 export interface CellConfig {
   name: string;
@@ -91,14 +13,14 @@ export interface CellConfig {
 }
 
 const runTemplateService = new RunTemplateService();
-const Preview: React.FC = (props, context) => {
+const Preview: React.FC = (props: any) => {
   const targetKey = props?.targetKeys;
   const sampleSequence = props?.randomSample?.sampleData;
   const injectionBatch = props?.selectBatch;
   const injectTemplate = props?.injectTemplate;
 
   // 根据title选择字段
-  let columnArr: { title: any; dataIndex: any; key: any; }[] = [];
+  const columnArr: { title: any; dataIndex: any; key: any; }[] = [];
   targetKey.map((item: any) => {
     return columnArr.push({
       title: item,
@@ -279,10 +201,8 @@ const Preview: React.FC = (props, context) => {
           </Space>
         </div>
       </Card>
-
     </>
   )
-    ;
 };
 
 export default Preview;

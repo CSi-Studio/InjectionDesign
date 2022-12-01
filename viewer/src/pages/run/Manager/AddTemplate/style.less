@@ -34,3 +34,433 @@
   right: -24px;
   top: -4px;
 }
+
+.card {
+  margin-bottom: 24px;
+}
+
+.result {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 24px 0 8px;
+}
+
+.editableCell {
+  position: relative;
+}
+
+.editableCellValueWrap {
+  padding: 5px 12px;
+  cursor: pointer;
+}
+
+.editableRow:hover .editableCellValueWrap {
+  padding: 4px 11px;
+  border: 1px solid #d9d9d9;
+  border-radius: 2px;
+}
+
+.specSampMethod * {
+  color: black !important;
+}
+
+.columnCenter {
+  background-color: #e2f0fd;
+}
+
+.selectedSampleType {
+  border-radius: 6px;
+}
+
+.selected {
+  background-color: #e2f0fd;
+}
+
+.selectedSampleTypeText {
+  display: inline-block;
+  color: #1890ff;
+  font-size: 20px;
+  font-weight: bolder;
+}
+.activeSampleTypeText {
+  display: inline-block;
+  color: #6232b3;
+  font-size: 20px;
+  border: 1px solid #8f4eff;
+  background-color: #F7F0FE;
+  text-align: center;
+  line-height: 40px;
+  border-radius: 6px;
+  padding: 0px 10px;
+}
+
+.selectedSamplePositionText {
+  display: inline-block;
+  color: #1890ff;
+  font-size: 20px;
+  background-color: #f5ecfd;
+}
+
+.selectedSampleTypeTextType {
+  display: inline-block;
+  color: #1890ff;
+  font-size: 20px;
+  background-color: #f7eefe;
+}
+
+/**
+ * 9*9孔板样式
+ */
+
+//9*9 gird样式头
+.gridHead {
+  display: grid;
+  grid-template-columns: repeat(9, 130px);
+  background-color: #f6f7f9;
+  grid-template-rows: 1fr;
+  grid-column-gap: 5px;
+  grid-row-gap: 5px;
+}
+//9*9 gird样式头内容
+.nineNineHeadContent {
+  background-color: #f7f7f8;
+  width: 40px;
+  height: 30px;
+  //border: 1px dotted #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  color: #a4a4a5;
+}
+
+//9*9 gird 样本板样式内容
+.nineNineContent {
+  //grid-area: 1 / 1 / 2 / 2;
+  background-color: #f0f0f0;
+  width: 130px;
+  height: 60px;
+  border: 1px solid #188ffe;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.nineNineContent:hover {
+  //grid-area: 1 / 1 / 2 / 2;
+  background-color: #188ffe;
+  width: 130px;
+  height: 60px;
+  border: 1px solid #188ffe;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+  color: #FFFFFF;
+
+  .show{
+    display: block;
+    font-size: 10px;
+    color: #FFFFFF;
+  }
+
+  .showEdit{
+    display: block;
+    font-size: 10px;
+    color: #FFFFFF;
+  }
+}
+
+.showEdit {
+  position: absolute;
+  top:-20px;
+  right:20px;
+  color: #FFFFFF;
+  display: none;
+  z-index: 888;
+  cursor: pointer;
+}
+
+.show {
+  position: absolute;
+  top:-20px;
+  right:4px;
+  color: #FFFFFF;
+  display: none;
+  z-index: 888;
+  cursor: pointer;
+}
+
+
+// 9*9 样本内容为空
+.nineNineInValidContent {
+  //grid-area: 1 / 1 / 2 / 2;
+  background-color: #f0f0f0;
+  width: 130px;
+  height: 60px;
+  border: 1px solid #eaeaeb;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.nineNineInValidContent:hover {
+  background-color: #b2b0b0;
+  width: 130px;
+  height: 60px;
+  border: 3px solid #eaeaeb;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+
+// 9*9 左侧栏
+.gridLeft {
+  display: grid;
+  grid-template-columns: 1fr;
+  background-color: #f6f7f9;
+  grid-template-rows: repeat(9, 60px);
+  grid-column-gap: 5px;
+  grid-row-gap: 5px;
+}
+
+/**
+ * 96孔板样式
+ */
+.gridHeadNinetySix {
+  display: grid;
+  grid-template-columns: repeat(12, 100px);
+  background-color: #f6f7f9;
+  grid-template-rows: 1fr;
+  grid-column-gap: 5px;
+  grid-row-gap: 5px;
+  width: 1255px;
+}
+
+.ninetySixHeadContent {
+  background-color: #f7f7f8;
+  width: 40px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  color: #a4a4a5;
+}
+
+.ninetySixContent {
+  //grid-area: 1 / 1 / 2 / 2;
+  background-color: #f0f0f0;
+  width: 100px;
+  height: 60px;
+  border: 1px solid #188ffe;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.ninetySixContent:hover {
+  //grid-area: 1 / 1 / 2 / 2;
+  background-color: #188ffe;
+  width: 100px;
+  height: 60px;
+  border: 1px solid #188ffe;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+  color: #FFFFFF;
+
+  .show{
+    display: block;
+    font-size: 10px;
+    color: #FFFFFF;
+  }
+}
+
+
+
+
+.gridLeftNinetySix {
+  display: grid;
+  grid-template-columns: 1fr;
+  background-color: #f6f7f9;
+  grid-template-rows: repeat(8, 60px);
+  grid-column-gap: 5px;
+  grid-row-gap: 5px;
+}
+
+
+.gridNinetySix {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  background-color: #fafbfd;
+  grid-column-gap: 5px;
+  grid-row-gap: 5px;
+  grid-auto-flow: column;
+}
+
+.ninetySixInValidContent {
+  //grid-area: 1 / 1 / 2 / 2;
+  background-color: #eaeaeb;
+  width: 100px;
+  height: 60px;
+  border: 1px solid #eaeaeb;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.ninetySixInValidContent:hover {
+  //grid-area: 1 / 1 / 2 / 2;
+  background-color: #b2b0b0;
+  width: 100px;
+  height: 60px;
+  border: 3px solid #eaeaeb;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.blankContent {
+  //grid-area: 1 / 1 / 2 / 2;
+  background-color: #fff2b8;
+  width: 100px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.mixContent {
+  //grid-area: 1 / 1 / 2 / 2;
+  background-color: #dcffcd;
+  width: 100px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.refContent {
+  //grid-area: 1 / 1 / 2 / 2;
+  background-color: #e7e7ff;
+  width: 100px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+.otherContent {
+  //grid-area: 1 / 1 / 2 / 2;
+  background-color: #ffece3;
+  width: 100px;
+  height: 60px;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.activeNinetySix {
+  background-color: #f7eefe;
+  width: 100px;
+  height: 60px;
+  border: 2px solid #6232b3;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.grid {
+  display: grid;
+  background-color: #f7f7f8;
+  grid-template-columns: repeat(9, 130px);
+  grid-template-rows: repeat(9, 1fr);
+  grid-column-gap: 5px;
+  grid-row-gap: 5px;
+  //grid-gap: 5px;
+  //border:1px dotted #fff;
+}
+
+.nineNineLeftContent {
+  background-color: #f7f7f8;
+  height: 60px;
+  //border: 1px dotted #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  color: #a4a4a5;
+}
+
+.nineNineLeftContentIndex0 {
+  background-color: #f7f7f8;
+  width: 20px;
+  height: 30px;
+  //border: 1px dotted #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  color: #a4a4a5;
+}
+
+.div3 {
+  width: 100%;
+  height: 40px;
+  border: 1px dotted #fff;
+  margin: 0 auto;
+}
+
+.active {
+  background-color: #f7eefe;
+  width: 130px;
+  height: 60px;
+  border: 2px solid #6232b3;
+  text-align: center;
+  line-height: 60px;
+  margin: 0 auto;
+  border-radius: 10px;
+}
+
+.sampleGradBoard {
+  background-color: #f8f9fa;
+  width: 90px;
+  height: 20px;
+  border: 1px solid #fff;
+  display: inline-block;
+  margin: 20px auto;
+}
+
+.sampleGrad {
+  background-color: #f8f9fa;
+  width: 200px;
+  height: 35px;
+  line-height: 35px;
+  border: 1px solid #fff;
+  display: inline-block;
+  margin-left: 40px;
+  padding: 0 10px;
+}
+
+// 录入样本 table 的 每一行的样式
+.tableActiveRow {
+  background-color: #869aea !important;
+}
+
+.orderTableActiveRow {
+  background-color: #e4f5fe !important;
+}

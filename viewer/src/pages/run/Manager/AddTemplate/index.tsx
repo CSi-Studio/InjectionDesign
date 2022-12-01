@@ -1,9 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Collapse, FormInstance, message, Popconfirm} from 'antd';
+import type { FormInstance} from 'antd';
+import {Collapse, message, Popconfirm} from 'antd';
 import {Card, Result, Button, Divider, Alert, Tag} from 'antd';
+import type {ProFormInstance} from '@ant-design/pro-form';
 import ProForm, {
   ProFormDigit,
-  ProFormInstance,
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
@@ -13,10 +14,11 @@ import type {StepDataType} from './data';
 import styles from './style.less';
 import {AddThree, ReduceOne} from "@icon-park/react";
 import {BackwardOutlined, CheckCircleTwoTone, MenuOutlined, PlusOutlined} from "@ant-design/icons";
-import {PreInjectionDetailType} from "./data";
-import PreHeartTable from "@/pages/project/detail/PreCollection";
+import type {PreInjectionDetailType} from "./data";
+import PreHeartTable from "@/pages/run/Manager/AddTemplate/PreCollection";
 import {SortableContainer, SortableElement, SortableHandle} from 'react-sortable-hoc';
-import {arrayMoveImmutable, ProColumns, useRefFunction, ProTable, ModalForm} from '@ant-design/pro-components';
+import type { ProColumns} from '@ant-design/pro-components';
+import {arrayMoveImmutable, useRefFunction, ProTable, ModalForm} from '@ant-design/pro-components';
 import {FormattedMessage, history} from "@@/exports";
 import CollapsePanel from "antd/es/collapse/CollapsePanel";
 import RunTemplateService from "@/services/RunTemplateService";
@@ -247,8 +249,7 @@ const StepForm: React.FC<Record<string, any>> = () => {
                     </>
                   }
                   className={styles.result}
-                >
-                </Result>,
+                 />,
               ];
             },
           }}
@@ -428,16 +429,14 @@ const StepForm: React.FC<Record<string, any>> = () => {
                   <FormattedMessage id='injection.Cyclic.add'/>
                 </Button>
                 <Collapse ghost>
-                  <CollapsePanel header={<FormattedMessage id='injection.advanced.setting'/>} key={1}></CollapsePanel>
+                  <CollapsePanel header={<FormattedMessage id='injection.advanced.setting'/>} key={1} />
                 </Collapse>
               </Card>
             </div>
           </StepsForm.StepForm>
           <StepsForm.StepForm
             //@ts-ignore
-            title={<FormattedMessage id='injection.preview'/>}>
-
-          </StepsForm.StepForm>
+            title={<FormattedMessage id='injection.preview'/>} />
         </StepsForm>
         <Divider style={{margin: '40px 0 24px'}}/>
         <div className={styles.desc}>
@@ -457,8 +456,7 @@ const StepForm: React.FC<Record<string, any>> = () => {
         onCancel={() => {
           currentCard.sampleList = []
           setShowRunSampleDetail(false)
-        }} value={""}>
-      </PreHeartTable>
+        }} value={""} />
 
       {/*添加循环进样*/}
       <ModalForm

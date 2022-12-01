@@ -2,7 +2,7 @@ import { InputRef, Tag } from 'antd';
 import { Button, Form, Input, Modal, Popconfirm, Table } from 'antd';
 import type { FormInstance } from 'antd/lib/form';
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import styles from './Style.less';
+import styles from './style.less';
 //@ts-ignore
 import { FormattedMessage } from 'umi';
 
@@ -43,14 +43,14 @@ interface EditableCellProps {
 
 // 可编辑单元格
 const EditableCell: React.FC<EditableCellProps> = ({
-  title,
-  editable,
-  children,
-  dataIndex,
-  record,
-  handleSave,
-  ...restProps
-}) => {
+                                                     title,
+                                                     editable,
+                                                     children,
+                                                     dataIndex,
+                                                     record,
+                                                     handleSave,
+                                                     ...restProps
+                                                   }) => {
   const [editing, setEditing] = useState(false);
   const inputRef = useRef<InputRef>(null);
   const form = useContext(EditableContext)!;

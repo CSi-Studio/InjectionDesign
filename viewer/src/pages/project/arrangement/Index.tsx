@@ -1,6 +1,6 @@
 import type {Pagination, Result} from '@/domains/Common';
 import type {Sample} from '@/domains/Sample.d';
-import {buildColumn} from '@/pages/project/detail/Column';
+import {buildColumn} from '@/pages/project/arrangement/Column';
 import DeviceService from '@/services/Device';
 import PreOrderService from '@/services/PreOrderService';
 import ProjectService from '@/services/ProjectService';
@@ -33,13 +33,13 @@ import {
   DirectionEnum, PlateNumber, PlateTypeEnum,
 } from '@/components/Enums/Const';
 
-import ExcelUpload from '@/pages/project/detail/ExcelUpload';
+import ExcelUpload from '@/pages/project/arrangement/ExcelUpload';
 import {getParam} from "@/utils/StringUtil";
 import {ProFormSelect} from "@ant-design/pro-form/es";
 //@ts-ignore
 import {FormattedMessage, useIntl, useLocation} from "umi";
 import {groupByAndCount4Samples, groupBySample} from "@/utils/CommonUtil";
-import {Column, Facet} from "@ant-design/charts";
+import {Column} from "@ant-design/charts";
 import PlateDesign from "@/pages/project/arrangement/PlateDesigner";
 import {MultiWellPicker} from "@/pages/arrangement/manager/WellPicker";
 import {PositionFormat} from "well-plates";
@@ -52,10 +52,8 @@ const ProjectDetail: React.FC = () => {
   /**
    * service
    */
-  const projectService = new ProjectService();
   const sampleService = new SampleService();
   new PreOrderService();
-  const deviceService = new DeviceService();
 
   const [projectId, setProjectId] = useState<string | undefined>();
   const [current, setCurrent] = useState(0);
@@ -64,17 +62,11 @@ const ProjectDetail: React.FC = () => {
    */
   const tableRef = useRef<ActionType>(); //Table组件的引用
   const updateFormRef = useRef<ProFormInstance>();
-  const [sampleDetail, setSampleDetail] = useState<any>();
-
-// 录入样本列表actionTable
-  const sampleDetailFormRef = useRef<ProFormInstance>();
 
   const [total, setTotal] = useState<any>(); //数据总行
   const [loading, setLoading] = useState<boolean>(); //数据总行数
   const [sampleRowKeys, setSampleRowKeys] = useState<Key[]>([]); //样本接收行Keys信息
   const [showExcelUpload, setShowExcelUpload] = useState<boolean>(false); //样本excel导入
-  const [boardSampleList, setBoardSampleList] = useState<any>([])
-  const [devicePlatforms, setDevicePlatforms] = useState<any>();
 
   const [plateRow, setPlateRow] = useState<number>(8);
   const [plateCol, setPlateCol] = useState<number>(12);
@@ -118,13 +110,6 @@ const ProjectDetail: React.FC = () => {
   const [selectBatch, setSelectBatch] = useState<any>();
   const [injectTemplate, setInjectTemplate] = useState<any>();
 
-
-
-  // 录入样本快捷输入
-  // useKeyPress(['i'], () => {
-  //   addSampleRef.current.focus()
-  // });
-
   /********************
    * 质谱工单 function
    *******************/
@@ -152,81 +137,12 @@ const ProjectDetail: React.FC = () => {
    * 项目id
    */
   const currentProjectId = getParam(useLocation(), "projectId");
-  // 初始化 下拉框数据
-  const initDevicePlatforms = async () => {
-    const res = await deviceService.getDevicePlatforms();
-    if (res.success) {
-      const data = res.data;
-      let newDevicePlatforms: {
-        value: string;
-        label: string;
-        disabled?: boolean;
-        children?: {
-          value: string;
-          label: string;
-          disabled?: boolean;
-          children?: { value: string; label: string; disable?: boolean }[];
-        }[];
-      }[] = [];
-      newDevicePlatforms.push({
-        value: `${intl.formatMessage({id: 'instrument'})}`,
-        label: `${intl.formatMessage({id: 'instrument'})}`,
-        disabled: true,
-      });
-      data.forEach((item: { id: string; deviceName: string; platformList: any[] }) => {
-        if (item.deviceName) {
-          newDevicePlatforms.push({
-            value: item.deviceName,
-            label: `${item.deviceName}`,
-            children: item.platformList.map(
-              (platform: { id: string; name: string; disabled?: boolean }) => {
-                return {
-                  value: platform.name,
-                  label: `${platform.name}`,
-                  children: [
-                    {
-                      value: `${intl.formatMessage({id: 'plate'})}`,
-                      label: `${intl.formatMessage({id: 'plate'})}`,
-                      disabled: true
-                    },
-                    {
-                      value: `${intl.formatMessage({id: '96.plate'})}`,
-                      label: `${intl.formatMessage({id: '96.plate'})}`,
-                    },
-                    {
-                      value: `${intl.formatMessage({id: 'injection.bottle'})}`,
-                      label: `${intl.formatMessage({id: 'injection.bottle'})}`,
-                    },
-                  ],
-                };
-              },
-            ),
-          });
-        }
-      });
-
-      newDevicePlatforms = newDevicePlatforms.map((item) => {
-        if (item.children) {
-          item.children.unshift({
-            value: `${intl.formatMessage({id: 'analytical.platform'})}`,
-            label: `${intl.formatMessage({id: 'analytical.platform'})}`,
-            disabled: true,
-          });
-        }
-        return item;
-      });
-      setDevicePlatforms(newDevicePlatforms);
-    }
-
-  };
 
   /**
    * 初始化页面
    */
   useEffect(() => {
     setProjectId(currentProjectId);
-    initDevicePlatforms();
-    getDetail();
   }, []);
 
   const onChange = (value: number) => {
@@ -262,27 +178,6 @@ const ProjectDetail: React.FC = () => {
     }
 
   }, [changeValues])
-
-  /**
-   * 获取项目列表
-   * @param id
-   */
-  async function getDetail(): Promise<void> {
-    if (projectId == undefined) {
-      return;
-    }
-    const result: any = await projectService.detail(projectId);
-    if (result.success) {
-      setSampleDetail(result.data);
-      //给样本信息表单赋值
-      sampleDetailFormRef?.current?.setFieldsValue({
-        owner: result.data.sampleOwner,
-        sampleSize: result.data.predictSampleSize,
-        volume: result.data.volume,
-      });
-    }
-
-  }
 
   /**
    * 样本接受toolbar
@@ -333,7 +228,6 @@ const ProjectDetail: React.FC = () => {
     } finally {
       setLoading(false);
     }
-
   }
 
   /**
@@ -353,7 +247,6 @@ const ProjectDetail: React.FC = () => {
       tableRef?.current?.reload();
       setLoading(false);
     }
-
   }
 
   /**
@@ -378,7 +271,6 @@ const ProjectDetail: React.FC = () => {
     } finally {
       setLoading(false);
     }
-
   }
 
   /**
@@ -437,7 +329,7 @@ const ProjectDetail: React.FC = () => {
     padding: [100,0,0,0],
     legend: {
       position: 'top',
-      maxRow: 4,
+      // maxRow: 4,
       itemHeight: 12,
       layout: 'horizontal',
       flipPage: false,
@@ -455,7 +347,7 @@ const ProjectDetail: React.FC = () => {
         fill: '#FFFFFF',
         opacity: 0.6,
       },
-      content: (item) => {
+      content: (item: any) => {
         return (item.count*100).toFixed(2)+"%";
       },
     }
@@ -735,7 +627,6 @@ const ProjectDetail: React.FC = () => {
                                return (
                                  <div style={{fontSize: 12}}>
                                    <div>{label}</div>
-                                   {/*<div>{index}</div>*/}
                                  </div>
                                );
                              }}

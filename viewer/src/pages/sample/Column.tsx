@@ -1,7 +1,7 @@
 import type { ProColumns } from '@ant-design/pro-table';
 import { Popconfirm} from 'antd';
 import type { Sample } from '@/domains/Sample.d';
-import { buildUpdateSampleModal } from '@/pages/project/detail/Modals';
+import { buildUpdateSampleModal } from '@/pages/sample/Modals';
 import {DeleteOutlined} from "@ant-design/icons";
 import { FormattedMessage } from 'umi';
 
