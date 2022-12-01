@@ -31,7 +31,7 @@ const Preview: React.FC = (props: any) => {
 
   const [page, setPage] = useState(1)
   const [data, setData] = useState([])
-  const [injectOrderData, setInjectOrderData] = useState<any[]>([]);
+  // const [injectOrderData, setInjectOrderData] = useState<any[]>([]);
   const [finalInjectionSequence, setFinalInjectionSequence] = useState<any[]>([]);
 
   // 最终导出文件格式
@@ -49,8 +49,8 @@ const Preview: React.FC = (props: any) => {
 
   // 生成dataSource
   useEffect(() => {
-    let finalInjectArr: React.SetStateAction<any[]> = []
-    for (let subSequence of finalInjectionSequence) {
+    const finalInjectArr: React.SetStateAction<any[]> = []
+    for (const subSequence of finalInjectionSequence) {
       subSequence.map((value: { id: any; sampleNo: any; set: any; position: any; }) => {
         finalInjectArr.push({
           "SampleID": value.id,
@@ -78,7 +78,7 @@ const Preview: React.FC = (props: any) => {
   async function getRunTemplate(template: string): Promise<any> {
     const result = await runTemplateService.getByName(template);
     if (result.success) {
-      setInjectOrderData(result.data.injectOrder)
+      // setInjectOrderData(result.data.injectOrder)
       //先获取样本总数及循环进样的次数，决定分组
       const resultSequence = genInjectionSequence(result.data.injectOrder, injectionBatch, sampleSequence)
       setFinalInjectionSequence(resultSequence)
@@ -137,14 +137,13 @@ const Preview: React.FC = (props: any) => {
    * 生成进样序列
    * 先按 sample的数量进行分组，对于qc则每次从qc数组中取一个，对于sample样本每次取一组，将所有样本均分成相同组
    */
-  function genInjectionSequence(data: any[], injectionBatch: any[], sampleSequence: any[]) {
-    if (data.length > 0) {
-      const sampleInjectConfig = data.filter(item => item.name === 'Sample')
+  function genInjectionSequence(injections: any[], batch: any[], sequence: any[]) {
+    if (injections.length > 0) {
+      const sampleInjectConfig = injections.filter(item => item.name === 'Sample')
       const injectionTime = sampleInjectConfig[0]?.times;
-      const injectSampleSequence = sampleSequence.filter(item => injectionBatch.includes(item.set));
+      const injectSampleSequence = sequence.filter(item => batch.includes(item.set));
       const _ = require('lodash');
       const groupSampleSequence = _.chunk(injectSampleSequence, injectionTime);
-      console.log(groupSampleSequence)
       return groupSampleSequence;
     }
     // let resArr = []

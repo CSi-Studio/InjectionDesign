@@ -1,7 +1,7 @@
 import ProForm, {ModalForm} from '@ant-design/pro-form';
 import { RunFields} from "@/domains/Run.d";
 import {Tag} from "antd";
-import {RunTemplate} from "@/domains/RunTemplate.d";
+import type {RunTemplate} from "@/domains/RunTemplate.d";
 import {FormattedMessage} from "@@/exports";
 
 export function buildUpdateModal(updateFormRef: any, doUpdate: any, run: RunTemplate){

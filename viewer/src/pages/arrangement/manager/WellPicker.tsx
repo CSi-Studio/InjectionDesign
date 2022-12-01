@@ -1,15 +1,17 @@
-import React, {
+import type {
   CSSProperties,
   FunctionComponent,
+  ReactNode} from 'react';
+import React, {
   useMemo,
   useState,
   useCallback,
-  useEffect,
-  ReactNode,
+  useEffect
 } from 'react';
-import { WellPlate, PositionFormat, SubsetMode } from 'well-plates';
+import type { PositionFormat} from 'well-plates';
+import { WellPlate, SubsetMode } from 'well-plates';
 
-import { Cell } from './WellPlate';
+import type { Cell } from './WellPlate';
 import { WellPlateInternal } from './util/WellPlateInternal';
 
 export enum RangeSelectionMode {
@@ -138,7 +140,7 @@ export const MultiWellPicker: FunctionComponent<IWellPickerProps> = ({
       // if there is no selection, do nothing
       if (bookedSet.size === 0) return;
       const newValue = [];
-      for (let bookedEl of bookedSet) {
+      for (const bookedEl of bookedSet) {
         if (!disabledSet.has(wellPlate.getPosition(bookedEl, 'index'))) {
           if (toggle) {
             if (!valueSet.has(bookedEl)) {
@@ -151,7 +153,7 @@ export const MultiWellPicker: FunctionComponent<IWellPickerProps> = ({
       }
 
       if (toggle) {
-        for (let selected of valueSet) {
+        for (const selected of valueSet) {
           if (!bookedSet.has(selected)) {
             newValue.push(selected);
           }

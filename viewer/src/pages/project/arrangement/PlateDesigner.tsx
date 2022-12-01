@@ -25,7 +25,7 @@ type IStateFullWellPickerProps = Omit<IWellPickerProps, 'onChange'>;
 const PlateDesign: React.FC = (props: any) => {
 
   const [setNo, setSetNo] = useState(1);
-  const [dataSource, setDataSource] = useState()
+  const [dataSource, setDataSource] = useState([])
   const [boardIndex, setBoardIndex] = useState([0])
   const [pageCurrent, setPageCurrent] = useState(1)
   const [sortedSamples, setSortedSamples] = useState<Record<string, any>[]>([])
@@ -51,13 +51,69 @@ const PlateDesign: React.FC = (props: any) => {
     setPlateSize(size);
   }
 
-  function setPropsSample(sampleData: any) {
+  function setPropsSample(samples: any[]) {
     props.setRandomSampleRes({
-      sampleData: sampleData,
+      sampleData: samples,
       plateCountArr: plateCountArr
     })
   }
 
+  const columns: ProColumns<SampleSequence>[] = [
+    {
+      key: 'index',
+      title: 'index',
+      dataIndex: 'index',
+      width: 60,
+      render: (text) => {
+        return <Tag color={"gray"} style={{borderRadius: "70%"}}>{text}</Tag>;
+      },
+    },
+    {
+      key: 'well',
+      title: 'Position',
+      dataIndex: 'position',
+      ellipsis: true,
+      width: 100,
+      render: (text) => {
+        return <Tag color={"gold"}>{text}</Tag>;
+      },
+    },
+    {
+      disable: true,
+      title: 'Sample No',
+      dataIndex: 'sampleNo',
+      key: 'sampleNo',
+      search: false,
+    },
+    {
+      key: 'Set No',
+      title: 'Set No',
+      dataIndex: 'set',
+      ellipsis: true,
+      width: 80,
+    },
+    {
+      key: 'dim1',
+      title: 'dim1',
+      dataIndex: 'dim1',
+      ellipsis: true,
+      width: 120,
+    },
+    {
+      key: 'dim2',
+      title: 'dim2',
+      dataIndex: 'dim2',
+      width: 120,
+      ellipsis: true,
+    },
+    {
+      key: 'dim3',
+      title: 'dim3',
+      dataIndex: 'dim3',
+      ellipsis: true,
+      width: 120,
+    },
+  ];
 
   function Init() {
     /**
@@ -275,63 +331,6 @@ const PlateDesign: React.FC = (props: any) => {
     saveWorkbook(workbook, 'Injection-Random-Simple.xlsx');
   }
 
-  const columns: ProColumns<SampleSequence>[] = [
-    {
-      key: 'index',
-      title: 'index',
-      dataIndex: 'index',
-      width: 60,
-      render: (text, record) => {
-        return <Tag color={"gray"} style={{borderRadius: "70%"}}>{text}</Tag>;
-      },
-    },
-    {
-      key: 'well',
-      title: 'Position',
-      dataIndex: 'position',
-      ellipsis: true,
-      width: 100,
-      render: (text, record) => {
-        return <Tag color={"gold"}>{text}</Tag>;
-      },
-    },
-    {
-      disable: true,
-      title: 'Sample No',
-      dataIndex: 'sampleNo',
-      key: 'sampleNo',
-      search: false,
-    },
-    {
-      key: 'Set No',
-      title: 'Set No',
-      dataIndex: 'set',
-      ellipsis: true,
-      width: 80,
-    },
-    {
-      key: 'dim1',
-      title: 'dim1',
-      dataIndex: 'dim1',
-      ellipsis: true,
-      width: 120,
-    },
-    {
-      key: 'dim2',
-      title: 'dim2',
-      dataIndex: 'dim2',
-      width: 120,
-      ellipsis: true,
-    },
-    {
-      key: 'dim3',
-      title: 'dim3',
-      dataIndex: 'dim3',
-      ellipsis: true,
-      width: 120,
-    },
-  ];
-
   const config = {
     xAxis: {
       label: {
@@ -420,7 +419,7 @@ const PlateDesign: React.FC = (props: any) => {
               rows={plateRow}
               columns={plateCol}
               wellSize={plateSize}
-              renderText={({index, label}) => {
+              renderText={({index}) => {
                 return (
                   <div style={{fontSize: 12}}>
                     <div>{index + 1}</div>
@@ -433,31 +432,31 @@ const PlateDesign: React.FC = (props: any) => {
               rangeSelectionMode={RangeSelectionMode.zone}
               style={({index, wellPlate, disabled, booked, selected}) => {
                 const position = wellPlate.getPosition(index, 'row_column');
-                const styles: CSSProperties = {};
+                const css: CSSProperties = {};
                 if (disabled) {
                   if (position.row === 1) {
-                    styles.backgroundColor = 'grey';
+                    css.backgroundColor = 'grey';
                   } else {
-                    styles.backgroundColor = 'lightgray';
+                    css.backgroundColor = 'lightgray';
                   }
                 }
                 if (selected) {
-                  styles.backgroundColor = 'pink';
+                  css.backgroundColor = 'pink';
                 }
                 if (booked && !disabled) {
-                  styles.borderColor = 'red';
+                  css.borderColor = 'red';
                 }
                 // 选中
                 if (boardIndex[0] === index) {
-                  styles.borderColor = 'red'
+                  css.borderColor = 'red'
                 }
 
                 // 筛选出set为当前set的样本
                 const setArr = sampleData.filter(item => item.set === setNo);
                 if (index < setArr.length) {
-                  styles.backgroundColor = 'gold'
+                  css.backgroundColor = 'gold'
                 }
-                return styles;
+                return css;
               }}
             />
           </Card>
@@ -491,9 +490,6 @@ const PlateDesign: React.FC = (props: any) => {
                 columnsState={{
                   persistenceKey: 'pro-table-singe-demos',
                   persistenceType: 'localStorage',
-                  onChange(value) {
-                    // console.log('value: ', value);
-                  },
                 }}
                 rowKey="id"
                 search={false}
@@ -502,7 +498,7 @@ const PlateDesign: React.FC = (props: any) => {
                     listsHeight: 400,
                   },
                 }}
-                rowClassName={(record, index, indent) => {
+                rowClassName={(record, index) => {
                   if (boardIndex[0] % 20 === index) {
                     return `${styles.tableActiveRow}`
                   }

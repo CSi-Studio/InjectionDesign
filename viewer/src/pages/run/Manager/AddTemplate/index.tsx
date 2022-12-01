@@ -23,8 +23,6 @@ import {FormattedMessage, history} from "@@/exports";
 import CollapsePanel from "antd/es/collapse/CollapsePanel";
 import RunTemplateService from "@/services/RunTemplateService";
 
-
-
 /**
  * import service
  */
@@ -48,57 +46,6 @@ const StepForm: React.FC<Record<string, any>> = () => {
     key: "0",
     sampleList: [],
   }
-
-
-  const [current, setCurrent] = useState(0);
-  const formRef = useRef<FormInstance>();
-  const [showRunSampleDetail, setShowRunSampleDetail] = useState<boolean>(false);
-  const [currentCard, setCurrentCard] = useState<any>();
-
-  //@ts-ignore
-  const [preInjectionType, setPreInjectionType] = useState<any>();
-  const [cyclicRunVisible, setCyclicRunVisible] = useState<boolean>(false);
-  const createFormRef = useRef<ProFormInstance>();
-
-
-  // 可拖动
-  const DragHandle = SortableHandle(() => <MenuOutlined style={{cursor: 'grab', color: '#999'}}/>);
-  const columns: ProColumns[] = [
-    {
-      title: <FormattedMessage id='run.sort'/>,
-      dataIndex: 'sort',
-      width: 60,
-      className: 'drag-visible',
-      render: () => <DragHandle/>,
-    },
-    {
-      title: <FormattedMessage id='run.sample.type'/>,
-      dataIndex: 'name',
-      className: 'drag-visible',
-    },
-    {
-      title: <FormattedMessage id='run.sample.injection.times'/>,
-      dataIndex: 'times',
-    },
-    {
-      title: <FormattedMessage id='run.sample.injection.area'/>,
-      dataIndex: 'address',
-    },
-    {
-      title: <FormattedMessage id='run.template.option'/>,
-      dataIndex: 'index',
-      render: (text, sample) => [
-        <Popconfirm placement={'topLeft'} title={<FormattedMessage id='confirm.delete'/>} key="delete"
-                    onConfirm={(item) => {
-                      const newDataSource = data;
-                      newDataSource.splice(sample.key, 1)
-                      setDataSource(newDataSource)
-                    }}>
-          <a><FormattedMessage id='delete'/></a>
-        </Popconfirm>
-      ],
-    },
-  ];
 
   const data = [
     {
@@ -133,7 +80,56 @@ const StepForm: React.FC<Record<string, any>> = () => {
     },
   ];
 
-  const [dataSource, setDataSource] = useState(data);
+  const [current, setCurrent] = useState(0);
+  const formRef = useRef<FormInstance>();
+  const [showRunSampleDetail, setShowRunSampleDetail] = useState<boolean>(false);
+  const [currentCard, setCurrentCard] = useState<any>();
+
+  //@ts-ignore
+  // const [preInjectionType, setPreInjectionType] = useState<any>();
+  const [cyclicRunVisible, setCyclicRunVisible] = useState<boolean>(false);
+  const createFormRef = useRef<ProFormInstance>();
+  const [dataSource, setDataSource] = useState<any>(data);
+
+  // 可拖动
+  const DragHandle = SortableHandle(() => <MenuOutlined style={{cursor: 'grab', color: '#999'}}/>);
+  const columns: ProColumns[] = [
+    {
+      title: <FormattedMessage id='run.sort'/>,
+      dataIndex: 'sort',
+      width: 60,
+      className: 'drag-visible',
+      render: () => <DragHandle/>,
+    },
+    {
+      title: <FormattedMessage id='run.sample.type'/>,
+      dataIndex: 'name',
+      className: 'drag-visible',
+    },
+    {
+      title: <FormattedMessage id='run.sample.injection.times'/>,
+      dataIndex: 'times',
+    },
+    {
+      title: <FormattedMessage id='run.sample.injection.area'/>,
+      dataIndex: 'address',
+    },
+    {
+      title: <FormattedMessage id='run.template.option'/>,
+      dataIndex: 'index',
+      render: (text, sample) => [
+        <Popconfirm placement={'topLeft'} title={<FormattedMessage id='confirm.delete'/>} key="delete"
+                    onConfirm={() => {
+                      const newDataSource = data;
+                      newDataSource.splice(sample.key, 1)
+                      setDataSource(newDataSource)
+                    }}>
+          <a><FormattedMessage id='delete'/></a>
+        </Popconfirm>
+      ],
+    },
+  ];
+
   const SortableItem = SortableElement((props: any) => <tr {...props} />);
   const SortContainer = SortableContainer((props: any) => <tbody {...props} />);
   const onSortEnd = useRefFunction(
@@ -160,7 +156,7 @@ const StepForm: React.FC<Record<string, any>> = () => {
   );
   const DraggableBodyRow = (props: any) => {
     const {className, style, ...restProps} = props;
-    const index = dataSource.findIndex((x) => x.index === restProps['data-row-key']);
+    const index = dataSource.findIndex((x: any) => x.index === restProps['data-row-key']);
     return <SortableItem index={index} {...restProps} />;
   };
 
@@ -198,7 +194,7 @@ const StepForm: React.FC<Record<string, any>> = () => {
             return true;
           }}
           submitter={{
-            render: (props, dom) => {
+            render: (props) => {
               if (props.step === 0) {
                 return (
                   <Button type="primary" onClick={() => props.onSubmit?.()}>
@@ -237,7 +233,7 @@ const StepForm: React.FC<Record<string, any>> = () => {
                       <Button key="gotoTwo" onClick={() => props.onPre?.()}>
                         {'<'} <FormattedMessage id='last.step'/>
                       </Button>,
-                      <Button type="primary" onClick={(value) => {
+                      <Button type="primary" onClick={() => {
                         formRef.current?.resetFields();
                         setCurrent(0);
                       }}>
@@ -258,7 +254,7 @@ const StepForm: React.FC<Record<string, any>> = () => {
             formRef={formRef}
             // @ts-ignore
             title={<FormattedMessage id='run.template.new'/>}
-            onFinish={async (values) => {
+            onFinish={async () => {
               return true;
             }}
           >
@@ -301,7 +297,7 @@ const StepForm: React.FC<Record<string, any>> = () => {
             formRef={formRef}
             // @ts-ignore
             title={<FormattedMessage id='run.template.start.up.config'/>}
-            onFinish={async (values) => {
+            onFinish={async () => {
               return true;
             }}
           >
@@ -336,7 +332,7 @@ const StepForm: React.FC<Record<string, any>> = () => {
                             }}
                             //@ts-ignore
                             onChange={(value: any) => {
-                              setPreInjectionType(value)
+                              // setPreInjectionType(value)
                               console.log(value)
                             }}
                           />
@@ -448,9 +444,9 @@ const StepForm: React.FC<Record<string, any>> = () => {
       {/*前置进样进样信息*/}
       <PreHeartTable
         visible={showRunSampleDetail}
-        onOk={(data) => {
+        onOk={(dataList: any[]) => {
           // ok的时候当前行清空，同时把当前行的值传递出去
-          currentCard.sampleList = data
+          currentCard.sampleList = dataList
           setShowRunSampleDetail(false)
         }}
         onCancel={() => {
@@ -476,8 +472,8 @@ const StepForm: React.FC<Record<string, any>> = () => {
           newData.push({
             key: '5',
             name: value?.sampleType,
-            age: value?.injectionTimes,
-            address: value?.injectionArea,
+            times: value?.injectionTimes,
+            // address: value?.injectionArea,
             index: 10,
           });
           setDataSource(data)

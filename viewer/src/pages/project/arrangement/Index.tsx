@@ -1,9 +1,7 @@
 import type {Pagination, Result} from '@/domains/Common';
 import type {Sample} from '@/domains/Sample.d';
 import {buildColumn} from '@/pages/project/arrangement/Column';
-import DeviceService from '@/services/Device';
 import PreOrderService from '@/services/PreOrderService';
-import ProjectService from '@/services/ProjectService';
 import SampleService from '@/services/SampleService';
 import {url} from '@/utils/request';
 import {
@@ -353,6 +351,7 @@ const ProjectDetail: React.FC = () => {
     }
   }
 
+  // @ts-ignore
   /**
    * 项目管理流程
    */
@@ -516,7 +515,7 @@ const ProjectDetail: React.FC = () => {
                           label={"CommonQC Position"}
                           placeholder="Please select"
                           tooltip={"color: green"}
-                          options={wellIndex.map((value, index, array) => {
+                          options={wellIndex.map((value, index) => {
                             if (solventQcPosition.includes(index + 1) || poolQcPosition.includes(index + 1) || ltrQcPosition.includes(index + 1)) {
                               return {...wellIndex[index], disabled: true}
                             }
@@ -533,7 +532,7 @@ const ProjectDetail: React.FC = () => {
                           name="ltrQcPosition"
                           label={"Long-TermQC Position"}
                           placeholder="Please select"
-                          options={wellIndex.map((value, index, array) => {
+                          options={wellIndex.map((value, index) => {
                             if (commonQcPosition.includes(index + 1) || solventQcPosition.includes(index + 1) || poolQcPosition.includes(index + 1)) {
                               return {...wellIndex[index], disabled: true}
                             }
@@ -553,7 +552,7 @@ const ProjectDetail: React.FC = () => {
                           name="PoolQcPosition"
                           label={"PoolQC Position"}
                           placeholder="Please select"
-                          options={wellIndex.map((value, index, array) => {
+                          options={wellIndex.map((value, index) => {
                             if (commonQcPosition.includes(index + 1) || solventQcPosition.includes(index + 1) || ltrQcPosition.includes(index + 1)) {
                               return {...wellIndex[index], disabled: true}
                             }
@@ -571,7 +570,7 @@ const ProjectDetail: React.FC = () => {
                           label={"SolventQC Position"}
                           placeholder="Please select"
                           tooltip={"color: tomato"}
-                          options={wellIndex.map((value, index, array) => {
+                          options={wellIndex.map((value, index) => {
                             if (commonQcPosition.includes(index + 1) || poolQcPosition.includes(index + 1) || ltrQcPosition.includes(index + 1)) {
                               return {...wellIndex[index], disabled: true}
                             }
@@ -623,7 +622,7 @@ const ProjectDetail: React.FC = () => {
                              }}
                              onChange={() => {
                              }}
-                             renderText={({index, label}) => {
+                             renderText={({label}) => {
                                return (
                                  <div style={{fontSize: 12}}>
                                    <div>{label}</div>
@@ -637,17 +636,20 @@ const ProjectDetail: React.FC = () => {
     },
     {
       title: "Randomization",
+      //@ts-ignore
       content: <PlateDesign plateParam={designParams} dimRes={[dim1Sample, dim2Sample, dim3Sample]}
                             sampleData={sampleData} setRandomSampleRes={setRandomSampleRes}/>
     },
     {
       title: "WorkSheet",
+      //@ts-ignore
       content: <WorkSheet randomSample={randomSampleRes} setTargetKey={setTargetKeys} setSelectBatch={setSelectBatch}
                           setInjectTemplate={setInjectTemplate}/>
 
     },
     {
       title: "Finish",
+      //@ts-ignore
       content: <Preview randomSample={randomSampleRes} targetKeys={targetKeys} selectBatch={selectBatch} injectTemplate={injectTemplate}/>
     },
   ];

@@ -1,4 +1,5 @@
-import { InputRef, Tag } from 'antd';
+import type { InputRef} from 'antd';
+import { Tag } from 'antd';
 import { Button, Form, Input, Modal, Popconfirm, Table } from 'antd';
 import type { FormInstance } from 'antd/lib/form';
 import React, { useContext, useEffect, useRef, useState } from 'react';

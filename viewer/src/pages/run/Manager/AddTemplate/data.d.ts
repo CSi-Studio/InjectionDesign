@@ -6,9 +6,6 @@ export interface StepDataType {
   receiverMode: string;
 }
 
-export type CurrentTypes = 'base' | 'confirm' | 'result';
-
-
 export type PreInjectionDetailType = {
   injectionType: string;
   priority: number;

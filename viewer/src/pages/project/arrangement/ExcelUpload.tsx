@@ -199,11 +199,11 @@ export default (props: {
         <Dragger
             // eslint-disable-next-line @typescript-eslint/no-shadow
             itemRender={(originNode: ReactElement, file: UploadFile, fileList: any[], actions: { download: Function, preview: Function, remove: Function }) => {
-                if (file.status == 'done') {
+                if (file.status === 'done') {
                     setProgress(100)
                     return <></>;
                 }
-                if (file.status == 'uploading') {
+                if (file.status === 'uploading') {
                     // @ts-ignore
                   setProgress(file.percent)
                     return <></>;
@@ -305,7 +305,7 @@ export default (props: {
             }}
             // eslint-disable-next-line react/no-children-prop
             children={<span style={{ fontSize: '16px' }}>{props.newAddStrDesc || `${intl.formatMessage({id: 'user.add.confirm.tip'})}`}</span>}
-            onFinish={async (values) => {
+            onFinish={async () => {
                 message.success(`${intl.formatMessage({id: 'success'})}`);
                 return true;
             }}
@@ -366,7 +366,7 @@ export default (props: {
             }}
             // eslint-disable-next-line react/no-children-prop
             children={<span style={{ fontSize: '16px' }}>{props.addCoverStrDesc}</span>}
-            onFinish={async (values) => {
+            onFinish={async () => {
                 message.success(`${intl.formatMessage({id: 'success'})}`);
                 return true;
             }}

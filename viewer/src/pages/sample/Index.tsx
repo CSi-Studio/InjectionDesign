@@ -9,7 +9,7 @@ import { DownOutlined } from '@ant-design/icons';
 import type { Run } from '@/domains/Run.d';
 import type { ProFormInstance } from '@ant-design/pro-form';
 import SampleService from '@/services/SampleService';
-import { Sample } from '@/domains/Sample.d';
+import type { Sample } from '@/domains/Sample.d';
 import { buildCreateModal } from '@/pages/sample/Modals';
 import { FormattedMessage, useIntl } from 'umi';
 

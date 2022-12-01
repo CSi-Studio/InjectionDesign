@@ -1,19 +1,21 @@
-import React, {
+import type {
   CSSProperties,
   FunctionComponent,
   SyntheticEvent,
+  ReactNode} from 'react';
+import React, {
   useMemo,
-  useCallback,
-  ReactNode,
+  useCallback
 } from 'react';
-import {
-  WellPlate as WellPlateClass,
+import type {
   PositionFormat,
-  RowColumnPosition,
+  RowColumnPosition} from 'well-plates';
+import {
+  WellPlate as WellPlateClass
 } from 'well-plates';
 
 import { WellPlateInternal } from './util/WellPlateInternal';
-import { IWellPlateCommonProps } from './util/types';
+import type { IWellPlateCommonProps } from './util/types';
 
 export interface Cell {
   index: number;
