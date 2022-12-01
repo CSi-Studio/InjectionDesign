@@ -68,6 +68,6 @@ export default {
   'menu.config': 'Config',
   'menu.Start Up': 'Start Up',
   'menu.Help': 'Help',
-  'menu.History': 'History',
+  'menu.Project': 'History',
   'menu.MS worksheet': 'MS Worksheet',
 };

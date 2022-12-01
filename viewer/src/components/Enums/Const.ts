@@ -41,6 +41,14 @@ export const PlateNumber = {
   '2': '1-N'
 }
 
+export const QCType = {
+  '1': 'Custom QC',
+  '2': 'Long-Term Reference QC',
+  '3': 'Pool QC',
+  '4': 'Solvent QC',
+  '5': 'Blank QC',
+}
+
 export const DirectionEnum = {
   '1': 'Horizontal',
   // '2': 'Vertical',

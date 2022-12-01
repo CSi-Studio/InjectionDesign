@@ -21,9 +21,9 @@
   {
     name: 'Help',
     path: '/help',
-    key: 'overview',
+    key: 'help',
     icon: 'HomeOutlined',
-    component: './overview/home'
+    component: './Index'
   },
   {
     name: 'Start Up',
@@ -33,7 +33,7 @@
     component: './project/arrangement/Index'
   },
   {
-    name: 'History',
+    name: 'Project',
     path: '/project',
     key: 'project',
     icon: 'ProfileOutlined',

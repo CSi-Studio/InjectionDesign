@@ -23,13 +23,11 @@ import {
   Modal,
   Row,
   Space,
-  Steps, Switch,
+  Steps,
 } from 'antd';
 import type {Key, CSSProperties} from 'react';
 import React, {useEffect, useRef, useState} from 'react';
-import {
-  DirectionEnum, PlateNumber, PlateTypeEnum,
-} from '@/components/Enums/Const';
+import {PlateNumber, PlateTypeEnum, QCType} from '@/components/Enums/Const';
 
 import ExcelUpload from '@/pages/project/arrangement/ExcelUpload';
 import {getParam} from "@/utils/StringUtil";
@@ -74,21 +72,22 @@ const ProjectDetail: React.FC = () => {
   const [plateNumber, setPlateNumber] = useState<PositionFormat>(PositionFormat.LetterNumber);
   const [paramsSizeError, setParamsSizeError] = useState<string>();
   const [plateCount, setPlateCount] = useState<number>(1); //需要的板子数目
-  const [checked, setChecked] = useState<boolean>(true);
   const [wellIndex, setWellIndex] = useState<any[]>([]);
+  const [selectedValues, setSelectedValues] = useState<any[]>([]);
 
   // 工单拷贝
   useState<any>(['1', '2', '3', '4', '5', '6', '7', '8', '9']);
   const intl = useIntl();
 
-  const [changeValues, setChangeValues] = useState<any>({});
-  const [commonQcPosition, setCommonQcPosition] = useState<any[]>([0]);
-  const [poolQcPosition, setPoolQcPosition] = useState<any[]>([0]);
+  const [customQcPosition, setCustomQcPosition] = useState<any[]>([0]);
+  const [pooledQcPosition, setPooledQcPosition] = useState<any[]>([0]);
   const [solventQcPosition, setSolventQcPosition] = useState<any[]>([0]);
   const [ltrQcPosition, setLtrQcPosition] = useState<any[]>([0]);
+  const [blankQcPosition, setBlankQcPosition] = useState<any[]>([0]);
   const [designParams, setDesignParams] = useState<any>({
     plateType: '2',
     maxSamplesOnSinglePlate: 96,
+    blankQcCount: 0,
     pooledQcCount: 0,
     ltrQcCount: 0,
     solventBlankQcCount: 0,
@@ -154,28 +153,29 @@ const ProjectDetail: React.FC = () => {
     setWellCount(wCount);
   }
 
+  const removeFromOther = (values: number[]) => {
+    values.forEach(value => {
+      if (customQcPosition.indexOf(value) !== -1){
+        customQcPosition.splice(customQcPosition.indexOf(value), 1);
+      }
+      if (ltrQcPosition.indexOf(value) !== -1){
+        ltrQcPosition.splice(ltrQcPosition.indexOf(value), 1);
+      }
+      if (solventQcPosition.indexOf(value) !== -1){
+        solventQcPosition.splice(solventQcPosition.indexOf(value), 1);
+      }
+      if (pooledQcPosition.indexOf(value) !== -1){
+        pooledQcPosition.splice(pooledQcPosition.indexOf(value), 1);
+      }
+      if (blankQcPosition.indexOf(value) !== -1){
+        blankQcPosition.splice(blankQcPosition.indexOf(value), 1);
+      }
+    })
+  }
+
   const getCapacity = (values: any) => {
     return values.maxSamplesOnSinglePlate + values.pooledQcCount + values.ltrQcCount + values.solventBlankQcCount + values.processBlankQcCount + values.commonQcCount
   }
-  /**
-   * 监听参数变化
-   */
-  useEffect(() => {
-    console.log("changeValues", changeValues, Object.keys(changeValues))
-    if (Object.keys(changeValues).indexOf("commonQcPosition") > -1) {
-      setCommonQcPosition(changeValues.commonQcPosition);
-    }
-    if (Object.keys(changeValues).indexOf("PoolQcPosition") > -1) {
-      setPoolQcPosition(changeValues.PoolQcPosition);
-    }
-    if (Object.keys(changeValues).indexOf("SolventQcPosition") > -1) {
-      setSolventQcPosition(changeValues.SolventQcPosition);
-    }
-    if (Object.keys(changeValues).indexOf("ltrQcPosition") > -1) {
-      setLtrQcPosition(changeValues.ltrQcPosition);
-    }
-
-  }, [changeValues])
 
   /**
    * 样本接受toolbar
@@ -426,7 +426,6 @@ const ProjectDetail: React.FC = () => {
                       ...changedValues
                     }
                     setParamsSizeError(undefined);
-                    setChangeValues(changedValues)
                     setDesignParams(values)
                     setPlateCount(Math.ceil(total / values.maxSamplesOnSinglePlate))
 
@@ -462,13 +461,13 @@ const ProjectDetail: React.FC = () => {
                                            setPlateType(9, 9, 50, 81);
                                            break;
                                          case "2":
-                                           setPlateType(8, 16, 50, 96);
+                                           setPlateType(8, 12, 40, 96);
                                            break;
                                          case "3":
                                            setPlateType(16, 24, 28, 384);
                                            break;
                                          default:
-                                           setPlateType(8, 16, 50, 96);
+                                           setPlateType(8, 12, 40, 96);
                                        }
                                      }
                                    }}
@@ -488,107 +487,43 @@ const ProjectDetail: React.FC = () => {
                                            break;
                                        }
                                      }
-                                   }}
-                    />
-                    <ProFormSelect rules={[{required: true, message: 'required'}]} width={150} name="direction"
-                                   label='Direction' valueEnum={DirectionEnum}/>
+                                   }}/>
                   </ProForm.Group>
-                  <Divider/>
-                  {/*选择qc区域，选择进样位置,选择样本进样模板*/}
-                  {/*是否有qc样本，若有则需要定义qc区域*/}
-                  {/*选择进样模板，前置进样*/}
-                  <Switch
-                    unCheckedChildren="DefineQC"
-                    checkedChildren="NoQC"
-                    checked={checked}
-                    onChange={(c) => setChecked(c)}
-                    style={{marginTop: 16}}
-                  />
-                  {checked ?
-                    <div>
-                      <ProForm.Group>
-                        <ProFormDigit min={0} width={120} name="commonQcCount" label={"QC(Common Type)"}/>
-                        <ProFormSelect
-                          width={200}
-                          mode="multiple"
-                          name="commonQcPosition"
-                          label={"CommonQC Position"}
-                          placeholder="Please select"
-                          tooltip={"color: green"}
-                          options={wellIndex.map((value, index) => {
-                            if (solventQcPosition.includes(index + 1) || poolQcPosition.includes(index + 1) || ltrQcPosition.includes(index + 1)) {
-                              return {...wellIndex[index], disabled: true}
-                            }
-                            return wellIndex[index];
-                          })}
-                        />
-
-
-                        <Divider type={"horizontal"}/>
-                        <ProFormDigit min={0} width={120} name="ltrQcCount" label={"QC(Long Term Reference)"}/>
-                        <ProFormSelect
-                          width={200}
-                          mode="multiple"
-                          name="ltrQcPosition"
-                          label={"Long-TermQC Position"}
-                          placeholder="Please select"
-                          options={wellIndex.map((value, index) => {
-                            if (commonQcPosition.includes(index + 1) || solventQcPosition.includes(index + 1) || poolQcPosition.includes(index + 1)) {
-                              return {...wellIndex[index], disabled: true}
-                            }
-                            return wellIndex[index];
-                          })}
-                          tooltip={"color:gold"}
-                        >
-                        </ProFormSelect>
-                      </ProForm.Group>
-
-
-                      <ProForm.Group>
-                        <ProFormDigit min={0} width={120} name="PoolSample" label={"QC(Pooled Samples)"}/>
-                        <ProFormSelect
-                          width={200}
-                          mode="multiple"
-                          name="PoolQcPosition"
-                          label={"PoolQC Position"}
-                          placeholder="Please select"
-                          options={wellIndex.map((value, index) => {
-                            if (commonQcPosition.includes(index + 1) || solventQcPosition.includes(index + 1) || ltrQcPosition.includes(index + 1)) {
-                              return {...wellIndex[index], disabled: true}
-                            }
-                            return wellIndex[index];
-                          })}
-                          tooltip={"color: garygreen"}
-                        >
-                        </ProFormSelect>
-                        <Divider type={"horizontal"}/>
-                        <ProFormDigit min={0} width={120} name="SolventQc" label={"QC(Solvent Blank)"}/>
-                        <ProFormSelect
-                          width={200}
-                          mode="multiple"
-                          name="SolventQcPosition"
-                          label={"SolventQC Position"}
-                          placeholder="Please select"
-                          tooltip={"color: tomato"}
-                          options={wellIndex.map((value, index) => {
-                            if (commonQcPosition.includes(index + 1) || poolQcPosition.includes(index + 1) || ltrQcPosition.includes(index + 1)) {
-                              return {...wellIndex[index], disabled: true}
-                            }
-                            return wellIndex[index];
-                          })}
-                        >
-                        </ProFormSelect>
-                      </ProForm.Group>
-                      <Divider/>
-                    </div>
-                    : <></>}
                 </ProForm>
 
               </Col>
             </Row>
           </Col>
           <Col span={12}>
-            <MultiWellPicker value={[]} rows={plateRow} columns={plateCol} wellSize={plateSize} format={plateNumber}
+            <ProFormSelect width={200} name="qcType" label={"QC Type"} valueEnum={QCType}
+                           fieldProps={{
+                             onSelect: function (label: string) {
+                               if (selectedValues && selectedValues.length > 0){
+                                 const selectedPositions = selectedValues.map(value=>value+1);
+                                 removeFromOther(selectedPositions);
+                                 switch (label) {
+                                   case "1": // Custom QC
+                                     setCustomQcPosition(selectedPositions);
+                                     break;
+                                   case "2": //Long-Term Reference QC
+                                     setLtrQcPosition(selectedPositions);
+                                     break;
+                                   case "3": //Pooled QC
+                                     setPooledQcPosition(selectedPositions);
+                                     break;
+                                   case "4": //Solvent QC
+                                     setSolventQcPosition(selectedPositions);
+                                     break;
+                                   case "5": //Blank QC
+                                     setBlankQcPosition(selectedPositions);
+                                     break;
+                                 }
+                                 setSelectedValues([]);
+                               }
+
+                             }
+                           }}/>
+            <MultiWellPicker value={selectedValues} rows={plateRow} columns={plateCol} wellSize={plateSize} format={plateNumber}
                              style={({index, wellPlate, disabled, booked, selected}) => {
                                const position = wellPlate.getPosition(index, 'row_column');
                                const styles: CSSProperties = {};
@@ -599,28 +534,38 @@ const ProjectDetail: React.FC = () => {
                                    styles.backgroundColor = 'lightgray';
                                  }
                                }
-                               if (selected) {
-                                 styles.backgroundColor = 'pink';
-                               }
+
                                if (booked && !disabled) {
                                  styles.borderColor = 'red';
                                }
 
-                               if (commonQcPosition.indexOf(index + 1) > -1) {
+                               if (customQcPosition.indexOf(index + 1) > -1) {
                                  styles.backgroundColor = 'green';
                                }
                                if (ltrQcPosition.indexOf(index + 1) > -1) {
                                  styles.backgroundColor = 'gold';
                                }
-                               if (poolQcPosition.indexOf(index + 1) > -1) {
+                               if (pooledQcPosition.indexOf(index + 1) > -1) {
                                  styles.backgroundColor = 'greenyellow';
                                }
                                if (solventQcPosition.indexOf(index + 1) > -1) {
                                  styles.backgroundColor = 'tomato';
                                }
+                               if (blankQcPosition.indexOf(index + 1) > -1) {
+                                 styles.backgroundColor = 'purple';
+                               }
+
+                               if (selected) {
+                                 styles.backgroundColor = 'pink';
+                               }
                                return styles;
                              }}
-                             onChange={() => {
+                             onChange={(values, labels) => {
+                               if (values.length === 1 && selectedValues.length === 1 && values[0] === selectedValues[0]){
+                                 setSelectedValues([]);
+                               }else{
+                                 setSelectedValues(values);
+                               }
                              }}
                              renderText={({label}) => {
                                return (
