@@ -14,7 +14,7 @@ const Settings: LayoutSettings & {
   fixedHeader: false,
   fixSiderbar: false,
   colorWeak: false,
-  title: 'InjectionPro',
+  title: 'Injection Design',
   pwa: false,
   logo: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
   iconfontUrl: '',

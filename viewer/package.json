@@ -1,6 +1,6 @@
 {
-  "name": "Injection",
-  "version": "2.0.0",
+  "name": "Injection Design",
+  "version": "1.0.0",
   "private": true,
   "description": "An out-of-box UI solution for enterprise applications",
   "scripts": {

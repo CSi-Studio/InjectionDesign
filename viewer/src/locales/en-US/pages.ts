@@ -1,10 +1,10 @@
 export default {
-  'pages.layouts.system.title': 'InjectionPro',
-  'pages.layouts.userLayout.title': 'Welcome to InjectionPro',
+  'pages.layouts.system.title': 'Injection Design',
+  'pages.layouts.userLayout.title': 'Welcome to Injection Design',
   'pages.login.accountLogin.tab': 'Account Login',
   'pages.login.accountLogin.errorMessage': 'Incorrect username/password(admin/admin)',
   'pages.login.failure': 'Login failed, please try again!',
-  'pages.login.success': 'Login successful! Welcome to InjectionPro',
+  'pages.login.success': 'Login successful! Welcome to Injection Design',
   'pages.login.username.placeholder': 'Username: admin',
   'pages.login.username.required': 'Please input your username!',
   'pages.login.password.placeholder': 'Password: admin',

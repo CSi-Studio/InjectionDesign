@@ -1,8 +1,8 @@
 import {BaseService} from "@/services/BaseService";
-import {RunTemplate} from "@/domains/RunTemplate.d";
+import type {RunTemplate} from "@/domains/RunTemplate.d";
 import {request} from "@@/plugin-request";
-import {Result} from "@/domains/Common";
-import {Key} from "react";
+import type {Result} from "@/domains/Common";
+import type {Key} from "react";
 
 export default class RunTemplateService extends BaseService<RunTemplate> {
   getDomain(): string {

@@ -10,24 +10,6 @@ export default class SampleService extends BaseService<Sample> {
 
   beforeAdd(): any {}
 
-  /** sampleNo模糊查询 */
-  public async getBlurSampleList(params: { sampleNo: string; projectId: string }) {
-    return request<Result<any[]>>(`${API_URL}/${this.getDomain()}/blurList`, {
-      method: 'GET',
-      params: { ...params },
-    });
-  }
-
-  /** 存储样本预估值 */
-  public async savePredictSampleSize(params: any) {
-    return request<Result<Boolean>>(`${API_URL}/${this.getDomain()}/save`, {
-      method: 'POST',
-      params: {
-        ...params,
-      },
-    });
-  }
-
   /** 存储样本预估值 */
   public async uploadExcel(params: any) {
     console.log("param", params)
