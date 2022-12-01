@@ -1,0 +1,93 @@
+.excelModal {
+  display: flex;
+  justify-content: center;
+
+  .leftModal {
+    margin-right: 25px;
+    font-size: 18px;
+  }
+}
+
+.dragger {
+  height: 144px !important;
+  width: 100%;
+  border-radius: 10px !important;
+}
+
+.excelDes {
+  line-height: 30px;
+}
+
+.progress {
+  width: 430px;
+  height: 18px;
+
+  :global(.ant-progress-bg) {
+    height: 18px !important;
+  }
+}
+
+.progressStr {
+  position: absolute;
+  top: 43%;
+  left: 46%;
+  z-index: 2;
+  color: #fff;
+}
+
+.successDiv {
+  height: 144px !important;
+  width: 100%;
+  top: 0;
+  border-radius: 10px;
+  position: absolute;
+  cursor: default;
+
+  .successStrP {
+    margin-left: 18px;
+    float: left;
+    .errorSpanA{
+      position: absolute;
+      right: 104px;
+    }
+  }
+
+  .excelSuccess {
+    height: 48px;
+    width: 414px;
+    background-color: #FFFFFF;
+    line-height: 50px;
+    margin: auto;
+    border-radius: 8px;
+
+    .fileNameSpan {
+      margin-left: 18px;
+      float: left;
+
+      .nameSpan {
+        color: #999999;
+      }
+    }
+
+    .closeSpan {
+      margin-right: 18px;
+      float: right;
+      color: rgba(0, 0, 0, 0.85);
+    }
+
+    .closeSpan:hover {
+      color: #1E90FF;
+    }
+  }
+}
+ 
+:global(.ant-modal-footer){
+  border-top: 0 !important;
+  padding: 10px 32px 32px 32px;
+  :global(.ant-space-align-center){
+    gap: 32px !important;
+  }
+}
+:global(.ant-modal-body){
+  padding: 32px 32px 18px 32px;
+}

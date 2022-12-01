@@ -1,0 +1,122 @@
+@import '~antd/es/style/variable.less';
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+.colorWeak {
+  filter: invert(80%);
+}
+
+.ant-layout {
+  min-height: 100vh;
+}
+.ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
+  left: unset;
+}
+
+canvas {
+  display: block;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+@media (max-width: @screen-xs) {
+  .ant-table {
+    width: 100%;
+    overflow-x: auto;
+    &-thead > tr,
+    &-tbody > tr {
+      > th,
+      > td {
+        white-space: pre;
+        > span {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+.ant-pro-basicLayout-content {
+  //position: relative;
+  margin: 10px;
+}
+
+.ant-table-row-hover > td {
+  background: #c9c9c9 !important;
+}
+.ant-table-tbody > tr.ant-table-row:hover > td {
+  background: #c9c9c9 !important;
+}
+.ant-table-pagination.ant-pagination {
+  margin-top: 5px !important;
+  margin-bottom: 2px !important;
+  // font-size: 12px !important;
+}
+.ant-pro-table .ant-pro-table-search {
+  margin-bottom: 5px !important;
+  padding: 5px 10px !important;
+  background: #fff;
+}
+
+.ant-form-item {
+  //margin-bottom: 4px !important;
+  //line-height: 1.2 !important;
+}
+
+.ant-descriptions-title {
+  margin-bottom: 10px !important;
+  line-height: 1 !important;
+}
+.ant-descriptions-bordered .ant-descriptions-item-label,
+.ant-descriptions-bordered .ant-descriptions-item-content {
+  font-size: 13px !important;
+  line-height: 1 !important;
+}
+.ant-pro-page-header-wrap-children-content {
+  margin-top: 5px !important;
+  margin-left: 5px !important;
+}
+
+.ant-table.ant-table-small .ant-table-title,
+.ant-table.ant-table-small .ant-table-footer,
+.ant-table.ant-table-small .ant-table-thead > tr > th,
+.ant-table.ant-table-small .ant-table-tbody > tr > td,
+.ant-table.ant-table-small tfoot > tr > th,
+.ant-table.ant-table-small tfoot > tr > td {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}
+
+// Compatible with IE11
+@media screen and(-ms-high-contrast: active), (-ms-high-contrast: none) {
+  body .ant-design-pro > .ant-layout {
+    min-height: 100vh;
+  }
+}
+
+.project-status {
+  width: 120px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color:white;
+  font-size: 14px;
+}
+
+.ant-pro .ant-pro-layout .ant-pro-layout-content {
+  margin-inline: 0!important;
+}
