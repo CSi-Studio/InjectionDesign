@@ -13,7 +13,7 @@ const Basic: FC = () => {
             <div style={{color: '#e95420', fontSize: 18, marginBottom: 32}}>About</div>
             <div style={{marginBottom: 32}}>
               <h4>
-                <b style={{color: "#e95420"}}>Injection Design </b>
+                <b style={{color: "#e95420"}}>Injection Design</b>
                 helps researchers carry out well designed microplate
                 experiments. Proper experimental design including blocking and randomization of experimental
                 samples and conditions will help minimize unwanted bias and control

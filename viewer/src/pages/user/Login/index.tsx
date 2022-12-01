@@ -13,8 +13,9 @@ import {Alert, message, Tabs} from 'antd';
 import React, {useState} from 'react';
 import styles from './index.less';
 import {login} from "@/services/ant-design-pro/api";
-import {UserRegister, StateType} from "@/pages/user/register/service";
-import {Store} from "antd/es/form/interface";
+import type { StateType} from "@/pages/user/register/service";
+import {UserRegister} from "@/pages/user/register/service";
+import type {Store} from "antd/es/form/interface";
 import token from "@/utils/token";
 
 import {useRequest} from 'umi';
