@@ -18,16 +18,17 @@ import {
   Alert,
   Button,
   Card,
-  Col, Divider,
+  Col,
   message,
   Modal,
   Row,
   Space,
   Steps,
+  Tag,
 } from 'antd';
 import type {Key, CSSProperties} from 'react';
 import React, {useEffect, useRef, useState} from 'react';
-import {PlateNumber, PlateTypeEnum, QCType} from '@/components/Enums/Const';
+import {PlateNumber, PlateTypeEnum, QCColors, QCType} from '@/components/Enums/Const';
 
 import ExcelUpload from '@/pages/project/arrangement/ExcelUpload';
 import {getParam} from "@/utils/StringUtil";
@@ -67,12 +68,10 @@ const ProjectDetail: React.FC = () => {
   const [plateRow, setPlateRow] = useState<number>(8);
   const [plateCol, setPlateCol] = useState<number>(12);
   const [plateSize, setPlateSize] = useState<number>(40);
-  const [wellCount, setWellCount] = useState<number>(96);
 
   const [plateNumber, setPlateNumber] = useState<PositionFormat>(PositionFormat.LetterNumber);
   const [paramsSizeError, setParamsSizeError] = useState<string>();
   const [plateCount, setPlateCount] = useState<number>(1); //需要的板子数目
-  const [wellIndex, setWellIndex] = useState<any[]>([]);
   const [selectedValues, setSelectedValues] = useState<any[]>([]);
 
   // 工单拷贝
@@ -90,10 +89,8 @@ const ProjectDetail: React.FC = () => {
     blankQcCount: 0,
     pooledQcCount: 0,
     ltrQcCount: 0,
-    solventBlankQcCount: 0,
-    processBlankQcCount: 0,
-    commonQcCount: 0,
-    direction: '1',
+    solventQcCount: 0,
+    customQcCount: 0,
     plateNumber: '1',
     interBatchRandomMethod: '2',
     interBatchRandomDim: '1',
@@ -118,18 +115,6 @@ const ProjectDetail: React.FC = () => {
   const [dim2, setDim2] = useState<Record<string, any>[]>([]);
   const [dim3, setDim3] = useState<Record<string, any>[]>([]);
 
-  useEffect(() => {
-    const wellIndexArr = Array.from(Array(wellCount), (v, k) => k + 1);
-    const res: React.SetStateAction<any[]> = []
-    wellIndexArr.map((value) => {
-      res?.push({
-        label: value,
-        value: value
-      })
-    })
-    setWellIndex(res);
-  }, [wellCount])
-
   /**
    * 项目id
    */
@@ -146,35 +131,67 @@ const ProjectDetail: React.FC = () => {
     setCurrent(value);
   };
 
-  const setPlateType = (row: number, col: number, pSize: number, wCount: number) => {
+  useEffect(()=>{
+    judgeIfOutOfIndex(designParams);
+  },[designParams])
+
+
+  const setPlateType = (row: number, col: number, pSize: number) => {
     setPlateRow(row);
     setPlateCol(col);
     setPlateSize(pSize);
-    setWellCount(wCount);
   }
 
   const removeFromOther = (values: number[]) => {
     values.forEach(value => {
       if (customQcPosition.indexOf(value) !== -1){
         customQcPosition.splice(customQcPosition.indexOf(value), 1);
+        designParams.customQcCount--;
       }
       if (ltrQcPosition.indexOf(value) !== -1){
         ltrQcPosition.splice(ltrQcPosition.indexOf(value), 1);
+        designParams.ltrQcCount--;
       }
       if (solventQcPosition.indexOf(value) !== -1){
         solventQcPosition.splice(solventQcPosition.indexOf(value), 1);
+        designParams.solventQcCount--;
       }
       if (pooledQcPosition.indexOf(value) !== -1){
         pooledQcPosition.splice(pooledQcPosition.indexOf(value), 1);
+        designParams.pooledQcCount--;
       }
       if (blankQcPosition.indexOf(value) !== -1){
         blankQcPosition.splice(blankQcPosition.indexOf(value), 1);
+        designParams.blankQcCount--;
       }
     })
+    setDesignParams(designParams);
+    judgeIfOutOfIndex(designParams);
   }
 
   const getCapacity = (values: any) => {
-    return values.maxSamplesOnSinglePlate + values.pooledQcCount + values.ltrQcCount + values.solventBlankQcCount + values.processBlankQcCount + values.commonQcCount
+    return values.maxSamplesOnSinglePlate + values.pooledQcCount + values.ltrQcCount + values.solventQcCount + values.customQcCount
+  }
+
+  const judgeIfOutOfIndex = (values: any) =>{
+    setParamsSizeError(undefined);
+    switch (values.plateType) {
+      case "1":
+        if (getCapacity(values) > 81) {
+          setParamsSizeError("Max Samples Count + QC Count must <= 81");
+        }
+        break;
+      case "2":
+        if (getCapacity(values) > 96) {
+          setParamsSizeError("Max Samples Count + QC Count must <= 96");
+        }
+        break;
+      case "3":
+        if (getCapacity(values) > 384) {
+          setParamsSizeError("Max Samples Count + QC Count must <= 384");
+        }
+        break;
+    }
   }
 
   /**
@@ -458,16 +475,16 @@ const ProjectDetail: React.FC = () => {
                                      onSelect: function (label: string) {
                                        switch (label) {
                                          case "1":
-                                           setPlateType(9, 9, 50, 81);
+                                           setPlateType(9, 9, 50);
                                            break;
                                          case "2":
-                                           setPlateType(8, 12, 40, 96);
+                                           setPlateType(8, 12, 40);
                                            break;
                                          case "3":
-                                           setPlateType(16, 24, 28, 384);
+                                           setPlateType(16, 24, 28);
                                            break;
                                          default:
-                                           setPlateType(8, 12, 40, 96);
+                                           setPlateType(8, 12, 40);
                                        }
                                      }
                                    }}
@@ -488,14 +505,20 @@ const ProjectDetail: React.FC = () => {
                                        }
                                      }
                                    }}/>
+                    <Space direction={"vertical"}>
+                      <Tag style={{width:"150px", textAlign:"center"}} color={QCColors.Custom}>Custom QC</Tag>
+                      <Tag style={{width:"150px", textAlign:"center"}} color={QCColors.LTR}>Long Term Reference QC</Tag>
+                      <Tag style={{width:"150px", textAlign:"center"}} color={QCColors.Pooled}>Pooled QC</Tag>
+                      <Tag style={{width:"150px", textAlign:"center"}} color={QCColors.Solvent}>Solvent QC</Tag>
+                      <Tag style={{width:"150px", textAlign:"center"}} color={QCColors.Blank}>Blank QC</Tag>
+                    </Space>
                   </ProForm.Group>
                 </ProForm>
-
               </Col>
             </Row>
           </Col>
           <Col span={12}>
-            <ProFormSelect width={200} name="qcType" label={"QC Type"} valueEnum={QCType}
+            <ProFormSelect width={250} name="qcType" label={"QC Type"} valueEnum={QCType}
                            fieldProps={{
                              onSelect: function (label: string) {
                                if (selectedValues && selectedValues.length > 0){
@@ -504,23 +527,31 @@ const ProjectDetail: React.FC = () => {
                                  switch (label) {
                                    case "1": // Custom QC
                                      setCustomQcPosition(selectedPositions);
+                                     designParams.customQcCount = selectedPositions.length;
                                      break;
                                    case "2": //Long-Term Reference QC
                                      setLtrQcPosition(selectedPositions);
+                                     designParams.ltrQcCount = selectedPositions.length;
                                      break;
                                    case "3": //Pooled QC
                                      setPooledQcPosition(selectedPositions);
+                                     designParams.pooledQcCount = selectedPositions.length;
                                      break;
                                    case "4": //Solvent QC
                                      setSolventQcPosition(selectedPositions);
+                                     designParams.solventQcCount = selectedPositions.length;
                                      break;
                                    case "5": //Blank QC
                                      setBlankQcPosition(selectedPositions);
+                                     designParams.blankQcCount = selectedPositions.length;
+                                     break;
+                                   default:
                                      break;
                                  }
+                                 setDesignParams(designParams);
+                                 judgeIfOutOfIndex(designParams);
                                  setSelectedValues([]);
                                }
-
                              }
                            }}/>
             <MultiWellPicker value={selectedValues} rows={plateRow} columns={plateCol} wellSize={plateSize} format={plateNumber}
@@ -540,19 +571,19 @@ const ProjectDetail: React.FC = () => {
                                }
 
                                if (customQcPosition.indexOf(index + 1) > -1) {
-                                 styles.backgroundColor = 'green';
+                                 styles.backgroundColor = QCColors.Custom;
                                }
                                if (ltrQcPosition.indexOf(index + 1) > -1) {
-                                 styles.backgroundColor = 'gold';
+                                 styles.backgroundColor = QCColors.LTR;
                                }
                                if (pooledQcPosition.indexOf(index + 1) > -1) {
-                                 styles.backgroundColor = 'greenyellow';
+                                 styles.backgroundColor = QCColors.Pooled;
                                }
                                if (solventQcPosition.indexOf(index + 1) > -1) {
-                                 styles.backgroundColor = 'tomato';
+                                 styles.backgroundColor = QCColors.Solvent;
                                }
                                if (blankQcPosition.indexOf(index + 1) > -1) {
-                                 styles.backgroundColor = 'purple';
+                                 styles.backgroundColor = QCColors.Blank;
                                }
 
                                if (selected) {

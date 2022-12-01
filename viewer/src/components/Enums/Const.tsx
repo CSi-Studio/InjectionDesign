@@ -1,3 +1,5 @@
+import {Space, Tag} from "antd";
+
 export const Polarity = {
   Negative: { text: 'Negative', value: 'Negative' },
   Positive: { text: 'Positive', value: 'Positive' },
@@ -41,12 +43,21 @@ export const PlateNumber = {
   '2': '1-N'
 }
 
+export const QCColors = {
+  'Custom': '#f50',
+  'LTR': '#2db7f5',
+  'Pooled': '#87d068',
+  'Solvent': '#0094ff',
+  'Blank': '#00ff65',
+}
+
 export const QCType = {
-  '1': 'Custom QC',
-  '2': 'Long-Term Reference QC',
-  '3': 'Pool QC',
-  '4': 'Solvent QC',
-  '5': 'Blank QC',
+  '0': 'Clear',
+  '1': <Space><Tag style={{width:"20px", height:"20px", marginTop:5}} color={QCColors.Custom}></Tag>Custom QC</Space>,
+  '2': <Space><Tag style={{width:"20px", height:"20px", marginTop:5}} color={QCColors.LTR}></Tag>Long-Term Reference QC</Space>,
+  '3': <Space><Tag style={{width:"20px", height:"20px", marginTop:5}} color={QCColors.Pooled}></Tag>Pooled QC</Space>,
+  '4': <Space><Tag style={{width:"20px", height:"20px", marginTop:5}} color={QCColors.Solvent}></Tag>Solvent QC</Space>,
+  '5': <Space><Tag style={{width:"20px", height:"20px", marginTop:5}} color={QCColors.Blank}></Tag>Blank QC</Space>,
 }
 
 export const DirectionEnum = {
