@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.csibio.injection.client.constants.enums.ProjectStatus;
-import net.csibio.injection.client.domain.bean.PlatformConfig;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,7 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -46,11 +43,6 @@ public class ProjectDO implements Serializable {
      * 项目负责人
      */
     String owner;
-
-    /**
-     * 存储平台信息,Key为Platform名称
-     */
-    TreeMap<String, PlatformConfig> platformMap = new TreeMap<>();
 
     /**
      * 平台
