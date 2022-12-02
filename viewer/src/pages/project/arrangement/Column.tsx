@@ -27,6 +27,11 @@ export function buildColumn(updateForm: any, doUpdate: any, doDelete: any) {
       },
     },
     {
+      key: 'type',
+      title: 'Type',
+      dataIndex: 'type',
+    },
+    {
       key: 'dim1',
       title: 'dim1',
       dataIndex: 'dim1',
