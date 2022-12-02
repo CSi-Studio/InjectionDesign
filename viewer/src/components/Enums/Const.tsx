@@ -40,8 +40,8 @@ export const DimsEnum = {
 }
 
 export const PlateNumber = {
-  '1': 'A-Z',
-  '2': '1-N'
+  'LETTER_NUMBER': 'A-Z',
+  'NUMBER_NUMBER': '1-N'
 }
 
 export const QCColors = {

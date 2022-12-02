@@ -119,7 +119,7 @@ const PlateDesign: React.FC = (props: any) => {
     /**
      * props.platparam
      */
-    switch (props.plateParam.plateType) {
+    switch (props.plateType) {
       case '1':
         setPlateType(9, 9, 50);
         break;
@@ -132,12 +132,12 @@ const PlateDesign: React.FC = (props: any) => {
       default:
         setPlateType(8, 12, 40);
     }
-    setPlateFormat(props.plateParam.plateNumber === '1' ? PositionFormat.LetterNumber : PositionFormat.Sequential);
-    setMaxSampleOnSinglePlate(props.plateParam.maxSamplesOnSinglePlate);
+    setPlateFormat(props.plateNumber === '1' ? PositionFormat.LetterNumber : PositionFormat.Sequential);
+    setMaxSampleOnSinglePlate(props.maxSamplesOnSinglePlate);
 
     let pCount: number | undefined;
     if (props.sampleData?.length) {
-      pCount = Math.ceil(props.sampleData.length / props.plateParam.maxSamplesOnSinglePlate)
+      pCount = Math.ceil(props.sampleData.length / props.maxSamplesOnSinglePlate)
     } else {
       pCount = 1;
     }
@@ -158,15 +158,15 @@ const PlateDesign: React.FC = (props: any) => {
     switch (interBatchBalanceMethod) {
       case "1":
         // eslint-disable-next-line no-param-reassign
-        samples = randomBalance(samples, props.plateParam.maxSamplesOnSinglePlate);
+        samples = randomBalance(samples, props.maxSamplesOnSinglePlate);
         break;
       case "2":
         // eslint-disable-next-line no-param-reassign
-        samples = stratifiedBalance(samples, props.plateParam.maxSamplesOnSinglePlate, interBatchBalanceDim);
+        samples = stratifiedBalance(samples, props.maxSamplesOnSinglePlate, interBatchBalanceDim);
         break;
       default:
         // eslint-disable-next-line no-param-reassign
-        samples = randomBalance(samples, props.plateParam.maxSamplesOnSinglePlate);
+        samples = randomBalance(samples, props.maxSamplesOnSinglePlate);
         break;
     }
 

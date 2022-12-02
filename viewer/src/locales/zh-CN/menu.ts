@@ -67,6 +67,6 @@ export default {
   'menu.config': '系统配置',
   'menu.Start Up': '开始使用',
   'menu.Help': '帮助',
-  'menu.Project': '历史记录',
+  'menu.Project': '项目',
   'menu.MS worksheet': '质谱工单',
 };
