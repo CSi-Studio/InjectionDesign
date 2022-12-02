@@ -1,5 +1,4 @@
 import {Button, Card, Col, Row, Tag} from 'antd';
-import type {CSSProperties} from 'react';
 import React, {useEffect, useRef, useState} from 'react';
 import type {IWellPickerProps} from "@/pages/arrangement/manager/WellPicker";
 import {MultiWellPicker, RangeSelectionMode} from "@/pages/arrangement/manager/WellPicker";
@@ -20,6 +19,7 @@ import {groupBy} from "lodash";
 import * as ExcelJs from 'exceljs';
 import {generateHeaders, saveWorkbook} from "@/utils/ExcelUtils";
 import {DownloadOutlined} from "@ant-design/icons";
+import {buildStyles} from "@/pages/arrangement/manager/util/PlateStyle";
 
 type IStateFullWellPickerProps = Omit<IWellPickerProps, 'onChange'>;
 const PlateDesign: React.FC = (props: any) => {
@@ -43,9 +43,15 @@ const PlateDesign: React.FC = (props: any) => {
   const [plateCountArr, setPlateCountArr] = useState<number[]>([])
   const [plateCount, setPlateCount] = useState<number>(1)
 
+  const [customQcPosition] = useState<number[]>(props.customQcPosition);
+  const [pooledQcPosition] = useState<number[]>(props.pooledQcPosition);
+  const [solventQcPosition] = useState<number[]>(props.solventQcPosition);
+  const [ltrQcPosition] = useState<number[]>(props.ltrQcPosition);
+  const [blankQcPosition] = useState<number[]>(props.blankQcPosition);
+
   const actionRef = useRef<ActionType>();
 
-  function setPlateType(row: number, col: number, size: number) {
+  function buildPlateType(row: number, col: number, size: number) {
     setPlateRow(row);
     setPlateCol(col);
     setPlateSize(size);
@@ -116,23 +122,20 @@ const PlateDesign: React.FC = (props: any) => {
   ];
 
   function Init() {
-    /**
-     * props.platparam
-     */
     switch (props.plateType) {
       case '1':
-        setPlateType(9, 9, 50);
+        buildPlateType(9, 9, 50);
         break;
       case '2':
-        setPlateType(8, 12, 50);
+        buildPlateType(8, 12, 50);
         break;
       case '3':
-        setPlateType(16, 24, 28);
+        buildPlateType(16, 24, 28);
         break;
       default:
-        setPlateType(8, 12, 40);
+        buildPlateType(8, 12, 40);
     }
-    setPlateFormat(props.plateNumber === '1' ? PositionFormat.LetterNumber : PositionFormat.Sequential);
+    setPlateFormat(props.plateNumber);
     setMaxSampleOnSinglePlate(props.maxSamplesOnSinglePlate);
 
     let pCount: number | undefined;
@@ -366,174 +369,145 @@ const PlateDesign: React.FC = (props: any) => {
   return (
     <>
       <Row gutter={[5, 5]}>
-        <Col span={10}>
-          <Card>
-            <Row>
-              <Col span={24}>
-                <ProForm layout="horizontal" submitter={false}>
-                  <ProForm.Group>
-                    <ProFormDigit readonly={true} label={"Total Samples"}>{props.sampleData?.length}</ProFormDigit>
-                    <ProFormDigit readonly={true} label={"Total Plates"}>{plateCount}</ProFormDigit>
-                    <ProFormSelect initialValue={"1"} width={100} name="setNo" label='Set No'
-                                   fieldProps={{onChange: (value) => setSetNo(Number(value)), size: 'small'}}
-                                   options={plateCountArr?.map((item) => {
-                                     return {value: item, label: item}
-                                   })}/>
-                  </ProForm.Group>
-                  <ProForm.Group>
-                    <ProFormSelect width={180} name="interBatchBalanceMethod" label='Inter-Batch Balance Method'
-                                   valueEnum={BalanceMethodEnum} initialValue={"2"}
-                                   fieldProps={{
-                                     onChange: (value) => setInterBatchBalanceMethod(value),
-                                     size: 'small'
-                                   }}/>
-                    <ProFormSelect width={100} name="interBatchBalanceDim" label='Dim'
-                                   valueEnum={DimsEnum} initialValue={"1"}
-                                   fieldProps={{
-                                     onChange: (value) => {
-                                       setInterBatchBalanceDim(value)
-                                     }, size: 'small'
-                                   }}/>
-                    <Button type={'primary'} onClick={() => {
-                      IntraBatchRandom(InterBatchBalance());
-                    }}>Balance</Button>
-                  </ProForm.Group>
-                  <ProForm.Group>
-                    <ProFormSelect width={180} name="intraBatchRandomMethod" label='Intra-Batch Random Method'
-                                   valueEnum={RandomMethodEnum} initialValue={"2"}
-                                   fieldProps={{onChange: (value) => setIntraBatchRandomMethod(value), size: 'small'}}/>
-                    <ProFormSelect width={100} name="intraBatchRandomDim" label='Dim'
-                                   valueEnum={DimsEnum} initialValue={"1"}
-                                   fieldProps={{
-                                     onChange: (value) => {
-                                       setIntraBatchRandomDim(value)
-                                     }, size: 'small'
-                                   }}/>
-                    <Button type={'primary'} onClick={() => IntraBatchRandom()}>Random</Button>
-                  </ProForm.Group>
-                </ProForm>
-              </Col>
-            </Row>
-
-            <StateFullWellPicker
-              rows={plateRow}
-              columns={plateCol}
-              wellSize={plateSize}
-              renderText={({index}) => {
-                return (
-                  <div style={{fontSize: 12}}>
-                    <div>{index + 1}</div>
-                  </div>
-                );
-              }}
-              value={[0]}
-              displayAsGrid={false}
-              format={plateFormat}
-              rangeSelectionMode={RangeSelectionMode.zone}
-              style={({index, wellPlate, disabled, booked, selected}) => {
-                const position = wellPlate.getPosition(index, 'row_column');
-                const css: CSSProperties = {};
-                if (disabled) {
-                  if (position.row === 1) {
-                    css.backgroundColor = 'grey';
-                  } else {
-                    css.backgroundColor = 'lightgray';
-                  }
-                }
-                if (selected) {
-                  css.backgroundColor = 'pink';
-                }
-                if (booked && !disabled) {
-                  css.borderColor = 'red';
-                }
-                // 选中
-                if (boardIndex[0] === index) {
-                  css.borderColor = 'red'
-                }
-
-                // 筛选出set为当前set的样本
-                const setArr = sampleData.filter(item => item.set === setNo);
-                if (index < setArr.length) {
-                  css.backgroundColor = 'gold'
-                }
-                return css;
-              }}
-            />
+        <Col span={8}>
+          <Card size={"small"} extra={<Button onClick={onExportExcel} type={"primary"}><DownloadOutlined />Export</Button>}>
+            <ProForm layout="horizontal" submitter={false}>
+              <ProForm.Group>
+                <ProFormDigit readonly={true} label={"Total Samples"}>{props.sampleData?.length}</ProFormDigit>
+                <ProFormDigit readonly={true} label={"Total Plates"}>{plateCount}</ProFormDigit>
+                <ProFormSelect initialValue={"1"} width={100} name="setNo" label='Set No'
+                               fieldProps={{onChange: (value) => setSetNo(Number(value)), size: 'small'}}
+                               options={plateCountArr?.map((item) => {
+                                 return {value: item, label: item}
+                               })}/>
+              </ProForm.Group>
+              <ProForm.Group>
+                <ProFormSelect width={150} name="interBatchBalanceMethod" label='Inter-Batch'
+                               valueEnum={BalanceMethodEnum} initialValue={"2"}
+                               fieldProps={{
+                                 onChange: (value) => setInterBatchBalanceMethod(value),
+                                 size: 'small'
+                               }}/>
+                <ProFormSelect width={80} name="interBatchBalanceDim" label='Dim'
+                               valueEnum={DimsEnum} initialValue={"1"}
+                               fieldProps={{
+                                 onChange: (value) => {
+                                   setInterBatchBalanceDim(value)
+                                 }, size: 'small'
+                               }}/>
+                <Button type={'primary'} onClick={() => {
+                  IntraBatchRandom(InterBatchBalance());
+                }}>Balance</Button>
+              </ProForm.Group>
+              <ProForm.Group>
+                <ProFormSelect width={150} name="intraBatchRandomMethod" label='Intra-Batch'
+                               valueEnum={RandomMethodEnum} initialValue={"2"}
+                               fieldProps={{onChange: (value) => setIntraBatchRandomMethod(value), size: 'small'}}/>
+                <ProFormSelect width={80} name="intraBatchRandomDim" label='Dim'
+                               valueEnum={DimsEnum} initialValue={"1"}
+                               fieldProps={{
+                                 onChange: (value) => {
+                                   setIntraBatchRandomDim(value)
+                                 }, size: 'small'
+                               }}/>
+                <Button type={'primary'} onClick={() => IntraBatchRandom()}>Random</Button>
+              </ProForm.Group>
+            </ProForm>
           </Card>
         </Col>
-        <Col span={14}>
-          <Row gutter={[10, 10]}>
-            <Col span={24}>
-              <Card title={"Distribution on Sets"} size={'small'}>
-                <Column height={150} autoFit={true} isStack={true} data={setSamples} xField={'set'}
-                        yField={'count'} seriesField={'dim'} {...config}/>
-              </Card>
-            </Col>
-            <Col span={24}>
-              <Card title={"Injection Order on Set No" + setNo} size={'small'}>
-                <Scatter height={150} autoFit={true} data={sortedSamples} xField={'index'} colorField={DimsEnum[intraBatchRandomDim]} size={5}
-                         yField={DimsEnum[intraBatchRandomDim]} shapeField={DimsEnum[intraBatchRandomDim]} {...config} legend={false}/>
-              </Card>
-            </Col>
-            <Col span={24}>
-              <Button style={{float: "right", marginBottom: 10}} onClick={onExportExcel} type={"primary"}><DownloadOutlined />Export</Button>
-              <ProTable<SampleSequence>
-                size={'small'}
-                columns={columns}
-                actionRef={actionRef}
-                cardBordered
-                //@ts-ignore
-                dataSource={dataSource}
-                editable={{
-                  type: 'multiple',
-                }}
-                columnsState={{
-                  persistenceKey: 'pro-table-singe-demos',
-                  persistenceType: 'localStorage',
-                }}
-                rowKey="id"
-                search={false}
-                options={{
-                  setting: {
-                    listsHeight: 400,
-                  },
-                }}
-                rowClassName={(record, index) => {
-                  if (boardIndex[0] % 20 === index) {
-                    return `${styles.tableActiveRow}`
-                  }
-                  if (index == 0) {
-                    // return `${styles.tableActiveRow}`
-                    return ''
-                  } else {
-                    return ''
-                  }
-                }}
-                form={{
-                  // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-                  syncToUrl: (values, type) => {
-                    if (type === 'get') {
-                      return {
-                        ...values,
-                        created_at: [values.startTime, values.endTime],
-                      };
-                    }
-                    return values;
-                  },
-                }}
-                pagination={{
-                  pageSize: 15,
-                  current: pageCurrent,
-                  onChange: (page) => {
-                    setPageCurrent(page)
-                  },
-                }}
-                dateFormatter="string"
-                headerTitle="Sample"
-                toolBarRender={false}
-              /></Col>
-            <Col span={24}/>
-          </Row>
+        <Col span={8}>
+          <Card title={"Distribution on Sets"} size={'small'}>
+            <Column height={200} autoFit={true} isStack={true} data={setSamples} xField={'set'}
+                    yField={'count'} seriesField={'dim'} {...config}/>
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card title={"Injection Order on Set No" + setNo} size={'small'}>
+            <Scatter height={200} autoFit={true} data={sortedSamples} xField={'index'} colorField={DimsEnum[intraBatchRandomDim]} size={5}
+                     yField={DimsEnum[intraBatchRandomDim]} shapeField={DimsEnum[intraBatchRandomDim]} {...config} legend={false}/>
+          </Card>
+        </Col>
+        <Col span={12}>
+          <StateFullWellPicker
+            rows={plateRow}
+            columns={plateCol}
+            wellSize={plateSize}
+            renderText={({index}) => {
+              return (
+                <div style={{fontSize: 12}}>
+                  <div>{index + 1}</div>
+                </div>
+              );
+            }}
+            value={[0]}
+            displayAsGrid={false}
+            format={plateFormat}
+            rangeSelectionMode={RangeSelectionMode.zone}
+            style={({index, wellPlate, disabled, booked, selected}) => {
+              return buildStyles({index, wellPlate, disabled, booked, selected},
+                customQcPosition,
+                ltrQcPosition,
+                pooledQcPosition,
+                solventQcPosition,
+                blankQcPosition,[]
+                // sampleData.filter(item => item.set === setNo).map(item=>item.index)
+              )
+            }
+            }
+          />
+        </Col>
+        <Col span={12}>
+          <ProTable<SampleSequence>
+            size={'small'}
+            columns={columns}
+            actionRef={actionRef}
+            //@ts-ignore
+            dataSource={dataSource.filter(data=>data.set === setNo)}
+            editable={{
+              type: 'multiple',
+            }}
+            scroll={{
+              y: 400
+            }}
+            columnsState={{
+              persistenceKey: 'pro-table-singe-demos',
+              persistenceType: 'localStorage',
+            }}
+            rowKey="id"
+            search={false}
+            options={{
+              setting: {
+                listsHeight: 400,
+              },
+            }}
+            rowClassName={(record, index) => {
+              if (boardIndex[0] % 20 === index) {
+                return `${styles.tableActiveRow}`
+              }
+              if (index == 0) {
+                // return `${styles.tableActiveRow}`
+                return ''
+              } else {
+                return ''
+              }
+            }}
+            form={{
+              // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
+              syncToUrl: (values, type) => {
+                if (type === 'get') {
+                  return {
+                    ...values,
+                    created_at: [values.startTime, values.endTime],
+                  };
+                }
+                return values;
+              },
+            }}
+            pagination={false}
+            dateFormatter="string"
+            headerTitle="Sample"
+            toolBarRender={false}
+          />
         </Col>
       </Row>
     </>

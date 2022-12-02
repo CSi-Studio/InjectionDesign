@@ -26,7 +26,7 @@ import {
   Space,
   Steps,
 } from 'antd';
-import type {Key, CSSProperties} from 'react';
+import type {Key} from 'react';
 import React, {useEffect, useRef, useState} from 'react';
 import {PlateNumber, PlateTypeEnum, QCColors, QCType} from '@/components/Enums/Const';
 
@@ -42,6 +42,7 @@ import {MultiWellPicker} from "@/pages/arrangement/manager/WellPicker";
 import {PositionFormat} from "well-plates";
 import WorkSheet from "@/pages/project/arrangement/WorkSheet";
 import Preview from "@/pages/project/arrangement/PreView";
+import {buildStyles} from "@/pages/arrangement/manager/util/PlateStyle";
 
 const {Step} = Steps;
 const ProjectDetail: React.FC = () => {
@@ -78,14 +79,14 @@ const ProjectDetail: React.FC = () => {
   const intl = useIntl();
 
   const [customQcPosition, setCustomQcPosition] = useState<any[]>([]);
-  const [customQcCount, setCustomQcCount] = useState<number>(0);
   const [pooledQcPosition, setPooledQcPosition] = useState<any[]>([]);
-  const [pooledQcCount, setPooledQcCount] = useState<number>(0);
   const [solventQcPosition, setSolventQcPosition] = useState<any[]>([]);
-  const [solventQcCount, setSolventQcCount] = useState<number>(0);
   const [ltrQcPosition, setLtrQcPosition] = useState<any[]>([]);
-  const [ltrQcCount, setLtrQcCount] = useState<number>(0);
   const [blankQcPosition, setBlankQcPosition] = useState<any[]>([]);
+  const [customQcCount, setCustomQcCount] = useState<number>(0);
+  const [pooledQcCount, setPooledQcCount] = useState<number>(0);
+  const [solventQcCount, setSolventQcCount] = useState<number>(0);
+  const [ltrQcCount, setLtrQcCount] = useState<number>(0);
   const [blankQcCount, setBlankQcCount] = useState<number>(0);
 
   const [plateType, setPlateType] = useState<string>('2');
@@ -489,11 +490,11 @@ const ProjectDetail: React.FC = () => {
                                      }
                                    }}/>
                     <Space direction={"vertical"}>
-                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Custom }}/>{customQcCount} Custom QC</Space>
-                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.LTR }}/>{ltrQcCount} Long-Term Reference QC</Space>
-                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Pooled }}/>{pooledQcCount} Pooled QC</Space>
-                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Solvent }}/>{solventQcCount} Solvent QC</Space>
-                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Blank }}/>{blankQcCount} Blank QC</Space>
+                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Custom }}/><b>{customQcCount}</b> Custom QC</Space>
+                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.LTR }}/><b>{ltrQcCount}</b> Long-Term Reference QC</Space>
+                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Pooled }}/><b>{pooledQcCount}</b> Pooled QC</Space>
+                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Solvent }}/><b>{solventQcCount}</b> Solvent QC</Space>
+                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Blank }}/><b>{blankQcCount}</b> Blank QC</Space>
                     </Space>
                   </ProForm.Group>
                 </ProForm>
@@ -538,41 +539,14 @@ const ProjectDetail: React.FC = () => {
                              }
                            }}/>
             <MultiWellPicker value={selectedValues} rows={plateRow} columns={plateCol} wellSize={plateSize} format={plateNumber}
-                             style={({index, wellPlate, disabled, booked, selected}) => {
-                               const position = wellPlate.getPosition(index, 'row_column');
-                               const styles: CSSProperties = {};
-                               if (disabled) {
-                                 if (position.row === 1) {
-                                   styles.backgroundColor = 'grey';
-                                 } else {
-                                   styles.backgroundColor = 'lightgray';
-                                 }
-                               }
-
-                               if (booked && !disabled) {
-                                 styles.borderColor = 'red';
-                               }
-
-                               if (customQcPosition.indexOf(index + 1) > -1) {
-                                 styles.backgroundColor = QCColors.Custom;
-                               }
-                               if (ltrQcPosition.indexOf(index + 1) > -1) {
-                                 styles.backgroundColor = QCColors.LTR;
-                               }
-                               if (pooledQcPosition.indexOf(index + 1) > -1) {
-                                 styles.backgroundColor = QCColors.Pooled;
-                               }
-                               if (solventQcPosition.indexOf(index + 1) > -1) {
-                                 styles.backgroundColor = QCColors.Solvent;
-                               }
-                               if (blankQcPosition.indexOf(index + 1) > -1) {
-                                 styles.backgroundColor = QCColors.Blank;
-                               }
-
-                               if (selected) {
-                                 styles.borderColor = 'red';
-                               }
-                               return styles;
+                             style={({index, wellPlate, disabled, booked, selected})=>{
+                               return buildStyles({index, wellPlate, disabled, booked, selected},
+                                 customQcPosition,
+                                 ltrQcPosition,
+                                 pooledQcPosition,
+                                 solventQcPosition,
+                                 blankQcPosition,
+                                 []);
                              }}
                              onChange={(values, labels) => {
                                if (values.length === 1 && selectedValues.length === 1 && values[0] === selectedValues[0]){
@@ -595,7 +569,13 @@ const ProjectDetail: React.FC = () => {
     {
       title: "Randomization",
       //@ts-ignore
-      content: <PlateDesign plateType={plateType} maxSamplesOnSinglePlate={maxSamplesOnSinglePlate} plateNumber={plateNumber} dimRes={[dim1Sample, dim2Sample, dim3Sample]}
+      content: <PlateDesign plateType={plateType} maxSamplesOnSinglePlate={maxSamplesOnSinglePlate}
+                            plateNumber={plateNumber} dimRes={[dim1Sample, dim2Sample, dim3Sample]}
+                            customQcPosition={customQcPosition}
+                            blankQcPosition={blankQcPosition}
+                            pooledQcPosition={pooledQcPosition}
+                            solventQcPosition={solventQcPosition}
+                            ltrQcPosition={ltrQcPosition}
                             sampleData={sampleData} setRandomSampleRes={setRandomSampleRes}/>
     },
     {

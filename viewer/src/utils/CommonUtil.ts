@@ -111,8 +111,6 @@ export function stratifiedBalance(samples: Sample[], maxCount: number, dim: stri
     Object.values(groups).forEach(group => {
       let point = 0;
       const mean = Math.floor(group.length / plateCount);
-      // const remainder = group.length - mean*plateCount;
-      // groupRemainder.push(remainder);
       for (let i = 0; i < countOnSets.length; i++) {
         if (sets[i] === undefined) {
           sets[i] = [];

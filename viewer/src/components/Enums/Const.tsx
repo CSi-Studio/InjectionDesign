@@ -29,7 +29,7 @@ export const BalanceMethodEnum = {
 }
 
 export const RandomMethodEnum = {
-  '1': 'Complete Random',
+  '1': 'Simple Random',
   '2': 'Block Random'
 }
 
