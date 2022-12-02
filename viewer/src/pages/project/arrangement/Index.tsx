@@ -7,6 +7,7 @@ import {url} from '@/utils/request';
 import {
   DeleteOutlined,
   DownloadOutlined,
+  TabletFilled,
   UploadOutlined,
 } from '@ant-design/icons';
 import {ProForm} from '@ant-design/pro-components';
@@ -506,11 +507,11 @@ const ProjectDetail: React.FC = () => {
                                      }
                                    }}/>
                     <Space direction={"vertical"}>
-                      <Tag style={{width:"150px", textAlign:"center"}} color={QCColors.Custom}>Custom QC</Tag>
-                      <Tag style={{width:"150px", textAlign:"center"}} color={QCColors.LTR}>Long Term Reference QC</Tag>
-                      <Tag style={{width:"150px", textAlign:"center"}} color={QCColors.Pooled}>Pooled QC</Tag>
-                      <Tag style={{width:"150px", textAlign:"center"}} color={QCColors.Solvent}>Solvent QC</Tag>
-                      <Tag style={{width:"150px", textAlign:"center"}} color={QCColors.Blank}>Blank QC</Tag>
+                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Custom }}/>{designParams.customQcCount} Custom QC</Space>
+                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.LTR }}/>{designParams.ltrQcCount} Long-Term Reference QC</Space>
+                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Pooled }}/>{designParams.pooledQcCount} Pooled QC</Space>
+                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Solvent }}/>{designParams.solventQcCount} Solvent QC</Space>
+                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Blank }}/>{designParams.blankQcCount} Blank QC</Space>
                     </Space>
                   </ProForm.Group>
                 </ProForm>
@@ -587,7 +588,7 @@ const ProjectDetail: React.FC = () => {
                                }
 
                                if (selected) {
-                                 styles.backgroundColor = 'pink';
+                                 styles.borderColor = 'red';
                                }
                                return styles;
                              }}
