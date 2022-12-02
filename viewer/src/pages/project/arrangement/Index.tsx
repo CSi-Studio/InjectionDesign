@@ -428,7 +428,7 @@ const ProjectDetail: React.FC = () => {
       title: 'Design Params',
       content: <Card>
         <Row gutter={[5, 5]}>
-          <Col span={12}>
+          <Col span={10}>
             <Row>
               <Col span={24}>
                 {paramsSizeError !== undefined ?
@@ -470,7 +470,7 @@ const ProjectDetail: React.FC = () => {
                                            buildPlateType(8, 12, 40);
                                            break;
                                          case "3":
-                                           buildPlateType(16, 24, 28);
+                                           buildPlateType(16, 24, 40);
                                            break;
                                          default:
                                            buildPlateType(8, 12, 40);
@@ -500,7 +500,7 @@ const ProjectDetail: React.FC = () => {
               </Col>
             </Row>
           </Col>
-          <Col span={12}>
+          <Col span={14}>
             <ProFormSelect width={250} name="qcType" label={"QC Type"} valueEnum={QCType}
                            fieldProps={{
                              onSelect: function (label: string) {
