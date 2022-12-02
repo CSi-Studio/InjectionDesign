@@ -41,6 +41,7 @@ public class SampleDO extends MysqlBaseDO implements Serializable {
     @Indexed
     private String projectId;
 
+    private String type = "Normal";
     //分类维度1
     private String dim1;
 

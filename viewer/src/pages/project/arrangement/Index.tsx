@@ -354,7 +354,7 @@ const ProjectDetail: React.FC = () => {
       itemName:{
         style:{
           fill: 'black',
-          fontSize: 16,
+          fontSize: 12,
           fontWeight: 500
         }
       }

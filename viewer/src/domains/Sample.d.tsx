@@ -112,6 +112,7 @@ export const SampleFields: any = {
 export type Sample = {
   id: string;
   sampleNo: string;
+  type: string;
   projectNo: string;
   dim1: string;
   dim2: string;

@@ -27,7 +27,6 @@ const PlateDesign: React.FC = (props: any) => {
   const [setNo, setSetNo] = useState(1);
   const [dataSource, setDataSource] = useState([])
   const [boardIndex, setBoardIndex] = useState([0])
-  const [pageCurrent, setPageCurrent] = useState(1)
   const [sortedSamples, setSortedSamples] = useState<Record<string, any>[]>([])
   const [setSamples, setSetSamples] = useState<any[]>([])
   const [interBatchBalanceMethod, setInterBatchBalanceMethod] = useState<string>('2')
@@ -43,11 +42,17 @@ const PlateDesign: React.FC = (props: any) => {
   const [plateCountArr, setPlateCountArr] = useState<number[]>([])
   const [plateCount, setPlateCount] = useState<number>(1)
 
+  const getAllQcPosition = () =>{
+    return props.customQcPosition.concat(props.pooledQcPosition).
+    concat(props.solventQcPosition).concat(props.ltrQcPosition).concat(props.blankQcPosition)
+  }
   const [customQcPosition] = useState<number[]>(props.customQcPosition);
   const [pooledQcPosition] = useState<number[]>(props.pooledQcPosition);
   const [solventQcPosition] = useState<number[]>(props.solventQcPosition);
   const [ltrQcPosition] = useState<number[]>(props.ltrQcPosition);
   const [blankQcPosition] = useState<number[]>(props.blankQcPosition);
+  const [samplePositionMap, setSamplePositionMap] = useState<any>({});
+  const [allQcPosition] = useState<number[]>(getAllQcPosition().sort((a: number,b: number)=>a-b));
 
   const actionRef = useRef<ActionType>();
 
@@ -285,16 +290,22 @@ const PlateDesign: React.FC = (props: any) => {
     const platePositionList = GenList(colArr, rowArr, ":");
 
     let lastSet: any;
-    let iter = 0;
+    let iter = allQcPosition[allQcPosition.length-1] + 1;
+    let samplePosition: number[] = [];
     samples.forEach((item, index) => {
       if (item.set !== lastSet) {
+        samplePositionMap[lastSet] = samplePosition;
         lastSet = item.set;
-        iter = 0;
+        iter = allQcPosition[allQcPosition.length-1] + 1;
+        samplePosition = [];
       }
-      item.index = index + 1;
+      // item.index = index + 1;
+      item.index = iter;
       item.position = platePositionList[iter];
+      samplePosition.push(iter);
       iter++;
     })
+    setSamplePositionMap(samplePositionMap);
     return samples;
   }
 
@@ -305,16 +316,6 @@ const PlateDesign: React.FC = (props: any) => {
     return <MultiWellPicker value={value} onChange={(value1) => {
       setValue(value1)
       setBoardIndex(value1)
-      const totalValue = value1[0] + (setNo - 1) * maxSampleOnSinglePlate;
-      if (totalValue < 20) {
-        setPageCurrent(1)
-      } else {
-        if (totalValue % 20 === 0) {
-          setPageCurrent(value1[0] / 20 + 1)
-        } else {
-          setPageCurrent(Math.ceil(totalValue / 20))
-        }
-      }
     }} {...otherProps} />;
   }
 
@@ -348,7 +349,7 @@ const PlateDesign: React.FC = (props: any) => {
       label: {
         style:{
           fill: 'black',
-          fontSize: 16,
+          fontSize: 12,
           fontWeight: 500,
         }
       }
@@ -357,7 +358,7 @@ const PlateDesign: React.FC = (props: any) => {
       itemName:{
         style:{
           fill: 'black',
-          fontSize: 16,
+          fontSize: 12,
           fontWeight: 500
         }
       }
@@ -449,7 +450,8 @@ const PlateDesign: React.FC = (props: any) => {
                 ltrQcPosition,
                 pooledQcPosition,
                 solventQcPosition,
-                blankQcPosition,[]
+                blankQcPosition,
+                samplePositionMap[setNo]
                 // sampleData.filter(item => item.set === setNo).map(item=>item.index)
               )
             }
