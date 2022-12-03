@@ -314,8 +314,9 @@ const PlateDesign: React.FC = (props: any) => {
     const platePositionList = GenerateList(colArr, rowArr, ":");
 
     let lastSet: any = 1;
-    let iter = allQcPosition.length === 0 ? 0 : allQcPosition[allQcPosition.length - 1] + 1;
+    let iter = getLastQcPosition();
     let samplePosition: number[] = [];
+    let qcSamplesGroup: any[] = [];
     samples.forEach((item, index) => {
       //开始创新一块新板子
       if (item.set !== lastSet) {
@@ -323,12 +324,11 @@ const PlateDesign: React.FC = (props: any) => {
         samplePositionMap[lastSet] = samplePosition;
         //Step2.设定当前新板子的信息
         lastSet = item.set;
-        iter = allQcPosition.length === 0 ? 0 : allQcPosition[allQcPosition.length - 1] + 1;
+        iter = getLastQcPosition();
         samplePosition = [];
         //Step3.初始化QC样品
-        BuildQcSamples(setNo);
+        qcSamplesGroup.concat(BuildQcSamples(setNo));
       }
-      // item.index = index + 1;
       item.index = iter;
       item.position = platePositionList[iter];
       samplePosition.push(iter);
@@ -336,7 +336,12 @@ const PlateDesign: React.FC = (props: any) => {
     })
     samplePositionMap[lastSet] = samplePosition;
     setSamplePositionMap(samplePositionMap);
+    samples.concat(qcSamplesGroup);
     return samples;
+  }
+
+  function getLastQcPosition() {
+    return allQcPosition.length === 0 ? 1 : allQcPosition[allQcPosition.length - 1] + 1;
   }
 
   function BuildQcSamples(setNo: number) {

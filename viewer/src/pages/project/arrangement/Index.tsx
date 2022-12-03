@@ -28,7 +28,7 @@ import {
 } from 'antd';
 import type {Key} from 'react';
 import React, {useEffect, useRef, useState} from 'react';
-import {PlateNumber, PlateTypeEnum, QCColors, QCType, QCTypeEnum} from '@/components/Enums/Const';
+import {PlateNumber, PlateTypeEnum, QCColors, QCTypeEnum} from '@/components/Enums/Const';
 
 import ExcelUpload from '@/pages/project/arrangement/ExcelUpload';
 import {getParam} from "@/utils/StringUtil";
@@ -68,7 +68,7 @@ const ProjectDetail: React.FC = () => {
 
   const [plateRow, setPlateRow] = useState<number>(8);
   const [plateCol, setPlateCol] = useState<number>(12);
-  const [plateSize, setPlateSize] = useState<number>(40);
+  const [wellSize, setWellSize] = useState<number>(50);
 
   const [paramsSizeError, setParamsSizeError] = useState<string>();
   const [plateCount, setPlateCount] = useState<number>(1); //需要的板子数目
@@ -126,10 +126,10 @@ const ProjectDetail: React.FC = () => {
     setCurrent(value);
   };
 
-  const buildPlateType = (row: number, col: number, pSize: number) => {
+  const buildPlateType = (row: number, col: number, wSize: number) => {
     setPlateRow(row);
     setPlateCol(col);
-    setPlateSize(pSize);
+    setWellSize(wSize);
   }
 
   const removeFromOther = (values: number[]) => {
@@ -378,6 +378,58 @@ const ProjectDetail: React.FC = () => {
     }
   }
 
+  const clearQcPosition = (label?: string) =>{
+    switch (label) {
+      case QCTypeEnum.Custom: // Custom QC
+        setCustomQcPosition([]);
+        break;
+      case QCTypeEnum.LTR: //Long-Term Reference QC
+        setLtrQcPosition([]);
+        break;
+      case QCTypeEnum.Pooled: //Pooled QC
+        setPooledQcPosition([]);
+        break;
+      case QCTypeEnum.Solvent: //Solvent QC
+        setSolventQcPosition([]);
+        break;
+      case QCTypeEnum.Blank: //Blank QC
+        setBlankQcPosition([]);
+        break;
+      default:
+        buildQCInfo([],[],[],[],[]);
+        break;
+    }
+    setJudge(judge+1)
+  }
+
+  const onQcPositionSelected = (label?: string) =>{
+    if (selectedValues && selectedValues.length > 0) {
+      const selectedPositions = selectedValues.map(value => value + 1);
+      removeFromOther(selectedPositions);
+      switch (label) {
+        case QCTypeEnum.Custom: // Custom QC
+          setCustomQcPosition(selectedPositions);
+          break;
+        case QCTypeEnum.LTR: //Long-Term Reference QC
+          setLtrQcPosition(selectedPositions);
+          break;
+        case QCTypeEnum.Pooled: //Pooled QC
+          setPooledQcPosition(selectedPositions);
+          break;
+        case QCTypeEnum.Solvent: //Solvent QC
+          setSolventQcPosition(selectedPositions);
+          break;
+        case QCTypeEnum.Blank: //Blank QC
+          setBlankQcPosition(selectedPositions);
+          break;
+        default:
+          break;
+      }
+
+      setJudge(judge + 1);
+      setSelectedValues([]);
+    }
+  }
   /**
    * 项目管理流程
    */
@@ -436,7 +488,7 @@ const ProjectDetail: React.FC = () => {
       title: 'Design Params',
       content: <Card>
         <Row gutter={[5, 5]}>
-          <Col span={10}>
+          <Col span={4}>
             <Row>
               <Col span={24}>
                 {paramsSizeError !== undefined ?
@@ -472,16 +524,16 @@ const ProjectDetail: React.FC = () => {
                                      onSelect: function (label: string) {
                                        switch (label) {
                                          case "1":
-                                           buildPlateType(9, 9, 50);
+                                           buildPlateType(9, 9, 60);
                                            break;
                                          case "2":
-                                           buildPlateType(8, 12, 40);
+                                           buildPlateType(8, 12, 60);
                                            break;
                                          case "3":
-                                           buildPlateType(16, 24, 40);
+                                           buildPlateType(16, 24, 35);
                                            break;
                                          default:
-                                           buildPlateType(8, 12, 40);
+                                           buildPlateType(8, 12, 60);
                                        }
                                        buildQCInfo([], [], [], [], []);
                                      }
@@ -503,57 +555,14 @@ const ProjectDetail: React.FC = () => {
                                        setPlateNumber(label);
                                      }
                                    }}/>
-                    <Space direction={"vertical"}>
-                      <Space><TabletFilled
-                        style={{fontSize: '24px', color: QCColors.Custom}}/><b>{customQcPosition.length}</b> Custom QC</Space>
-                      <Space><TabletFilled
-                        style={{fontSize: '24px', color: QCColors.LTR}}/><b>{ltrQcPosition.length}</b> Long-Term Reference
-                        QC</Space>
-                      <Space><TabletFilled
-                        style={{fontSize: '24px', color: QCColors.Pooled}}/><b>{pooledQcPosition.length}</b> Pooled QC</Space>
-                      <Space><TabletFilled
-                        style={{fontSize: '24px', color: QCColors.Solvent}}/><b>{solventQcPosition.length}</b> Solvent QC</Space>
-                      <Space><TabletFilled
-                        style={{fontSize: '24px', color: QCColors.Blank}}/><b>{blankQcPosition.length}</b> Blank QC</Space>
-                    </Space>
+
                   </ProForm.Group>
                 </ProForm>
               </Col>
             </Row>
           </Col>
-          <Col span={14}>
-            <ProFormSelect width={250} name="qcType" label={"QC Type"} valueEnum={QCType}
-                           fieldProps={{
-                             onSelect: function (label: string) {
-                               if (selectedValues && selectedValues.length > 0) {
-                                 const selectedPositions = selectedValues.map(value => value + 1);
-                                 removeFromOther(selectedPositions);
-                                 switch (label) {
-                                   case QCTypeEnum.Custom: // Custom QC
-                                     setCustomQcPosition(selectedPositions);
-                                     break;
-                                   case QCTypeEnum.LTR: //Long-Term Reference QC
-                                     setLtrQcPosition(selectedPositions);
-                                     break;
-                                   case QCTypeEnum.Pooled: //Pooled QC
-                                     setPooledQcPosition(selectedPositions);
-                                     break;
-                                   case QCTypeEnum.Solvent: //Solvent QC
-                                     setSolventQcPosition(selectedPositions);
-                                     break;
-                                   case QCTypeEnum.Blank: //Blank QC
-                                     setBlankQcPosition(selectedPositions);
-                                     break;
-                                   default:
-                                     break;
-                                 }
-
-                                 setJudge(judge + 1);
-                                 setSelectedValues([]);
-                               }
-                             }
-                           }}/>
-            <MultiWellPicker value={selectedValues} rows={plateRow} columns={plateCol} wellSize={plateSize}
+          <Col span={10}>
+            <MultiWellPicker value={selectedValues} rows={plateRow} columns={plateCol} wellSize={wellSize}
                              format={plateNumber}
                              style={({index, wellPlate, disabled, booked, selected}) => {
                                return buildStyles({index, wellPlate, disabled, booked, selected},
@@ -578,6 +587,31 @@ const ProjectDetail: React.FC = () => {
                                  </div>
                                );
                              }}/>
+          </Col>
+          <Col span={10}>
+            <Space direction={"vertical"} style={{marginBottom:10}}>
+              <Space><TabletFilled style={{fontSize: "24px",color: QCColors.Custom}}/><b>{customQcPosition.length}</b> Custom QC
+                <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.Custom)}>Add</Button>
+                <Button danger onClick={()=>clearQcPosition(QCTypeEnum.Custom)}>Clear</Button>
+              </Space>
+              <Space><TabletFilled style={{fontSize: "24px",color: QCColors.LTR}}/><b>{ltrQcPosition.length}</b> Long-Term Reference QC
+                <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.LTR)}>Add</Button>
+                <Button danger onClick={()=>clearQcPosition(QCTypeEnum.LTR)}>Clear</Button>
+              </Space>
+              <Space><TabletFilled style={{fontSize: "24px",color: QCColors.Pooled}}/><b>{pooledQcPosition.length}</b> Pooled QC
+                <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.Pooled)}>Add</Button>
+                <Button danger onClick={()=>clearQcPosition(QCTypeEnum.Pooled)}>Clear</Button>
+              </Space>
+              <Space><TabletFilled style={{fontSize: "24px",color: QCColors.Solvent}}/><b>{solventQcPosition.length}</b> Solvent QC
+                <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.Solvent)}>Add</Button>
+                <Button danger onClick={()=>clearQcPosition(QCTypeEnum.Solvent)}>Clear</Button>
+              </Space>
+              <Space><TabletFilled style={{fontSize: "24px",color: QCColors.Blank}}/><b>{blankQcPosition.length}</b> Blank QC
+                <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.Blank)}>Add</Button>
+                <Button danger onClick={()=>clearQcPosition(QCTypeEnum.Blank)}>Clear</Button>
+              </Space>
+              <Button danger onClick={()=>clearQcPosition()}>Clear All</Button>
+            </Space>
           </Col>
         </Row>
       </Card>,
