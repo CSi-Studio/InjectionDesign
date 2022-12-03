@@ -135,50 +135,66 @@ const ProjectDetail: React.FC = () => {
     setPlateRow(row);
     setPlateCol(col);
     setPlateSize(pSize);
-    // setMaxSamplesOnSinglePlate(row*col);
   }
 
   const removeFromOther = (values: number[]) => {
     values.forEach(value => {
-      if (customQcPosition.indexOf(value) !== -1){
+      if (customQcPosition.indexOf(value) !== -1) {
         customQcPosition.splice(customQcPosition.indexOf(value), 1);
       }
-      if (ltrQcPosition.indexOf(value) !== -1){
+      if (ltrQcPosition.indexOf(value) !== -1) {
         ltrQcPosition.splice(ltrQcPosition.indexOf(value), 1);
       }
-      if (solventQcPosition.indexOf(value) !== -1){
+      if (solventQcPosition.indexOf(value) !== -1) {
         solventQcPosition.splice(solventQcPosition.indexOf(value), 1);
       }
-      if (pooledQcPosition.indexOf(value) !== -1){
+      if (pooledQcPosition.indexOf(value) !== -1) {
         pooledQcPosition.splice(pooledQcPosition.indexOf(value), 1);
       }
-      if (blankQcPosition.indexOf(value) !== -1){
+      if (blankQcPosition.indexOf(value) !== -1) {
         blankQcPosition.splice(blankQcPosition.indexOf(value), 1);
       }
     })
     buildQCInfo(customQcPosition, blankQcPosition, ltrQcPosition, solventQcPosition, pooledQcPosition);
   }
 
-  const getCapacity = () => {
+  const getTotalCapacity = () => {
     return maxSamplesOnSinglePlate + pooledQcCount + ltrQcCount + solventQcCount + customQcCount + blankQcCount
   }
 
-  const judgeIfOutOfIndex = () =>{
+  const getCapacity = () => {
+    return pooledQcCount + ltrQcCount + solventQcCount + customQcCount + blankQcCount
+  }
+
+  const judgeIfOutOfIndex = () => {
     setParamsSizeError(undefined);
     switch (plateType) {
       case "1":
-        if (getCapacity() > 81) {
-          setParamsSizeError("Max Samples Count + QC Count must <= 81");
+        if (getTotalCapacity() > 81) {
+          if (getCapacity() > 81) {
+            setParamsSizeError("Max Samples Count + QC Count must <= 81");
+          } else {
+            setMaxSamplesOnSinglePlate(81 - getCapacity());
+          }
         }
         break;
       case "2":
-        if (getCapacity() > 96) {
-          setParamsSizeError("Max Samples Count + QC Count must <= 96");
+        if (getTotalCapacity() > 96) {
+          if (getCapacity() > 96) {
+            setParamsSizeError("Max Samples Count + QC Count must <= 96");
+          } else {
+            setMaxSamplesOnSinglePlate(96 - getCapacity());
+          }
+
         }
         break;
       case "3":
-        if (getCapacity() > 384) {
-          setParamsSizeError("Max Samples Count + QC Count must <= 384");
+        if (getTotalCapacity() > 384) {
+          if (getCapacity() > 384) {
+            setParamsSizeError("Max Samples Count + QC Count must <= 384");
+          } else {
+            setMaxSamplesOnSinglePlate(384 - getCapacity());
+          }
         }
         break;
     }
@@ -214,18 +230,19 @@ const ProjectDetail: React.FC = () => {
   }
 
   const buildQCInfo = (customQcP: number[], blankQcP: number[], ltrQcP: number[], solventQcP: number[], pooledQcP: number[]) => {
-      setCustomQcPosition(customQcP);
-      setCustomQcCount(customQcP.length);
-      setBlankQcPosition(blankQcP);
-      setBlankQcCount(blankQcP.length);
-      setLtrQcPosition(ltrQcP);
-      setLtrQcCount(ltrQcP.length);
-      setSolventQcPosition(solventQcP);
-      setSolventQcCount(solventQcP.length);
-      setPooledQcPosition(pooledQcP);
-      setPooledQcCount(pooledQcP.length);
-      setJudge(judge+1);
+    setCustomQcPosition(customQcP);
+    setCustomQcCount(customQcP.length);
+    setBlankQcPosition(blankQcP);
+    setBlankQcCount(blankQcP.length);
+    setLtrQcPosition(ltrQcP);
+    setLtrQcCount(ltrQcP.length);
+    setSolventQcPosition(solventQcP);
+    setSolventQcCount(solventQcP.length);
+    setPooledQcPosition(pooledQcP);
+    setPooledQcCount(pooledQcP.length);
+    setJudge(judge + 1);
   }
+
   /********************
    * 样本接收 function
    *******************/
@@ -327,7 +344,7 @@ const ProjectDetail: React.FC = () => {
     seriesField: 'name',
     xAxis: {
       label: {
-        style:{
+        style: {
           fill: 'black',
           fontSize: 16,
           fontWeight: 500,
@@ -336,7 +353,7 @@ const ProjectDetail: React.FC = () => {
     },
     yAxis: {
       label: {
-        style:{
+        style: {
           fill: 'black',
           fontSize: 14,
           fontWeight: 300,
@@ -344,15 +361,15 @@ const ProjectDetail: React.FC = () => {
       }
     },
     yField: 'count',
-    padding: [100,0,0,0],
+    padding: [100, 0, 0, 0],
     legend: {
       position: 'top',
       // maxRow: 4,
       itemHeight: 12,
       layout: 'horizontal',
       flipPage: false,
-      itemName:{
-        style:{
+      itemName: {
+        style: {
           fill: 'black',
           fontSize: 12,
           fontWeight: 500
@@ -366,7 +383,7 @@ const ProjectDetail: React.FC = () => {
         opacity: 0.6,
       },
       content: (item: any) => {
-        return (item.count*100).toFixed(2)+"%";
+        return (item.count * 100).toFixed(2) + "%";
       },
     }
   }
@@ -441,14 +458,14 @@ const ProjectDetail: React.FC = () => {
                   style={{marginTop: 20}}
                   onValuesChange={(changedValues) => {
                     setParamsSizeError(undefined);
-                    if (changedValues.plateType){
+                    if (changedValues.plateType) {
                       setPlateType(changedValues.plateType)
                     }
-                    if (changedValues.maxSamplesOnSinglePlate){
+                    if (changedValues.maxSamplesOnSinglePlate) {
                       setMaxSamplesOnSinglePlate(changedValues.maxSamplesOnSinglePlate)
                     }
                     setPlateCount(Math.ceil(total / maxSamplesOnSinglePlate))
-                    setJudge(judge+1)
+                    setJudge(judge + 1)
                   }}
                   name="basic"
                   layout="vertical"
@@ -481,7 +498,14 @@ const ProjectDetail: React.FC = () => {
                                    }}
                     />
                     <ProFormDigit rules={[{required: true, message: 'required'}]} width={150}
-                                  name="maxSamplesOnSinglePlate" min={1} label={"Max Samples on Single Plate"}/>
+                                  name="maxSamplesOnSinglePlate" min={1} label={"Max Samples on Single Plate"}
+                                  fieldProps={{
+                                    value: maxSamplesOnSinglePlate,
+                                    onChange: (value: any) => {
+                                      setMaxSamplesOnSinglePlate(value);
+                                    }
+                                  }}
+                    />
                     <ProFormSelect rules={[{required: true, message: 'required'}]} width={150} name="plateNumber"
                                    label={"Plate Number"} valueEnum={PlateNumber}
                                    fieldProps={{
@@ -490,11 +514,17 @@ const ProjectDetail: React.FC = () => {
                                      }
                                    }}/>
                     <Space direction={"vertical"}>
-                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Custom }}/><b>{customQcCount}</b> Custom QC</Space>
-                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.LTR }}/><b>{ltrQcCount}</b> Long-Term Reference QC</Space>
-                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Pooled }}/><b>{pooledQcCount}</b> Pooled QC</Space>
-                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Solvent }}/><b>{solventQcCount}</b> Solvent QC</Space>
-                      <Space><TabletFilled style={{ fontSize: '24px', color: QCColors.Blank }}/><b>{blankQcCount}</b> Blank QC</Space>
+                      <Space><TabletFilled
+                        style={{fontSize: '24px', color: QCColors.Custom}}/><b>{customQcCount}</b> Custom QC</Space>
+                      <Space><TabletFilled
+                        style={{fontSize: '24px', color: QCColors.LTR}}/><b>{ltrQcCount}</b> Long-Term Reference
+                        QC</Space>
+                      <Space><TabletFilled
+                        style={{fontSize: '24px', color: QCColors.Pooled}}/><b>{pooledQcCount}</b> Pooled QC</Space>
+                      <Space><TabletFilled
+                        style={{fontSize: '24px', color: QCColors.Solvent}}/><b>{solventQcCount}</b> Solvent QC</Space>
+                      <Space><TabletFilled
+                        style={{fontSize: '24px', color: QCColors.Blank}}/><b>{blankQcCount}</b> Blank QC</Space>
                     </Space>
                   </ProForm.Group>
                 </ProForm>
@@ -505,8 +535,8 @@ const ProjectDetail: React.FC = () => {
             <ProFormSelect width={250} name="qcType" label={"QC Type"} valueEnum={QCType}
                            fieldProps={{
                              onSelect: function (label: string) {
-                               if (selectedValues && selectedValues.length > 0){
-                                 const selectedPositions = selectedValues.map(value=>value+1);
+                               if (selectedValues && selectedValues.length > 0) {
+                                 const selectedPositions = selectedValues.map(value => value + 1);
                                  removeFromOther(selectedPositions);
                                  switch (label) {
                                    case "1": // Custom QC
@@ -533,13 +563,14 @@ const ProjectDetail: React.FC = () => {
                                      break;
                                  }
 
-                                 setJudge(judge+1);
+                                 setJudge(judge + 1);
                                  setSelectedValues([]);
                                }
                              }
                            }}/>
-            <MultiWellPicker value={selectedValues} rows={plateRow} columns={plateCol} wellSize={plateSize} format={plateNumber}
-                             style={({index, wellPlate, disabled, booked, selected})=>{
+            <MultiWellPicker value={selectedValues} rows={plateRow} columns={plateCol} wellSize={plateSize}
+                             format={plateNumber}
+                             style={({index, wellPlate, disabled, booked, selected}) => {
                                return buildStyles({index, wellPlate, disabled, booked, selected},
                                  customQcPosition,
                                  ltrQcPosition,
@@ -549,9 +580,9 @@ const ProjectDetail: React.FC = () => {
                                  []);
                              }}
                              onChange={(values, labels) => {
-                               if (values.length === 1 && selectedValues.length === 1 && values[0] === selectedValues[0]){
+                               if (values.length === 1 && selectedValues.length === 1 && values[0] === selectedValues[0]) {
                                  setSelectedValues([]);
-                               }else{
+                               } else {
                                  setSelectedValues(values);
                                }
                              }}
@@ -588,7 +619,8 @@ const ProjectDetail: React.FC = () => {
     {
       title: "Finish",
       //@ts-ignore
-      content: <Preview randomSample={randomSampleRes} targetKeys={targetKeys} selectBatch={selectBatch} injectTemplate={injectTemplate}/>
+      content: <Preview randomSample={randomSampleRes} targetKeys={targetKeys} selectBatch={selectBatch}
+                        injectTemplate={injectTemplate}/>
     },
   ];
   return (

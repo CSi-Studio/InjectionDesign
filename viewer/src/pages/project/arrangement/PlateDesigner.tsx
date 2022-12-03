@@ -11,7 +11,7 @@ import {PositionFormat} from "well-plates";
 import type {ActionType} from "@ant-design/pro-table";
 import {blockRandom, completeRandom, randomBalance, stratifiedBalance} from "@/utils/CommonUtil";
 import {Column, Scatter} from "@ant-design/charts";
-import {BalanceMethodEnum, DimsEnum, RandomMethodEnum} from "@/components/Enums/Const";
+import {BalanceMethodEnum, DimsEnum, QCColors, RandomMethodEnum} from "@/components/Enums/Const";
 import type {Sample, SampleSequence} from "@/domains/Sample.d";
 import ProForm, {ProFormDigit} from "@ant-design/pro-form";
 import {ProFormSelect} from "@ant-design/pro-form";
@@ -37,14 +37,12 @@ const PlateDesign: React.FC = (props: any) => {
   const [plateCol, setPlateCol] = useState<number>(12)
   const [plateSize, setPlateSize] = useState<number>(40)
   const [plateFormat, setPlateFormat] = useState<PositionFormat>(PositionFormat.LetterNumber)
-  const [maxSampleOnSinglePlate, setMaxSampleOnSinglePlate] = useState<number>(96)
   const [sampleData, setSampleData] = useState<any[]>([])
   const [plateCountArr, setPlateCountArr] = useState<number[]>([])
   const [plateCount, setPlateCount] = useState<number>(1)
 
-  const getAllQcPosition = () =>{
-    return props.customQcPosition.concat(props.pooledQcPosition).
-    concat(props.solventQcPosition).concat(props.ltrQcPosition).concat(props.blankQcPosition)
+  const getAllQcPosition = () => {
+    return props.customQcPosition.concat(props.pooledQcPosition).concat(props.solventQcPosition).concat(props.ltrQcPosition).concat(props.blankQcPosition)
   }
   const [customQcPosition] = useState<number[]>(props.customQcPosition);
   const [pooledQcPosition] = useState<number[]>(props.pooledQcPosition);
@@ -52,7 +50,7 @@ const PlateDesign: React.FC = (props: any) => {
   const [ltrQcPosition] = useState<number[]>(props.ltrQcPosition);
   const [blankQcPosition] = useState<number[]>(props.blankQcPosition);
   const [samplePositionMap, setSamplePositionMap] = useState<any>({});
-  const [allQcPosition] = useState<number[]>(getAllQcPosition().sort((a: number,b: number)=>a-b));
+  const [allQcPosition] = useState<number[]>(getAllQcPosition().sort((a: number, b: number) => a - b));
 
   const actionRef = useRef<ActionType>();
 
@@ -77,6 +75,29 @@ const PlateDesign: React.FC = (props: any) => {
       width: 60,
       render: (text) => {
         return <Tag color={"gray"} style={{borderRadius: "70%"}}>{text}</Tag>;
+      },
+    },
+    {
+      key: 'type',
+      title: 'Type',
+      dataIndex: 'type',
+      width: 100,
+      render: (text) => {
+        switch (text) {
+          case 'Normal':
+            return <Tag color={'gold'}>{text}</Tag>;
+          case 'Blank':
+            return <Tag color={QCColors.Blank}>{text}</Tag>;
+          case 'Solvent':
+            return <Tag color={QCColors.Solvent}>{text}</Tag>;
+          case 'Pooled':
+            return <Tag color={QCColors.Pooled}>{text}</Tag>;
+          case 'LTR':
+            return <Tag color={QCColors.Blank}>{text}</Tag>;
+          case 'Custom':
+            return <Tag color={QCColors.Custom}>{text}</Tag>;
+        }
+        return;
       },
     },
     {
@@ -141,7 +162,6 @@ const PlateDesign: React.FC = (props: any) => {
         buildPlateType(8, 12, 40);
     }
     setPlateFormat(props.plateNumber);
-    setMaxSampleOnSinglePlate(props.maxSamplesOnSinglePlate);
 
     let pCount: number | undefined;
     if (props.sampleData?.length) {
@@ -290,13 +310,14 @@ const PlateDesign: React.FC = (props: any) => {
     const platePositionList = GenList(colArr, rowArr, ":");
 
     let lastSet: any;
-    let iter = allQcPosition[allQcPosition.length-1] + 1;
+
+    let iter = allQcPosition.length === 0 ? 0 : allQcPosition[allQcPosition.length - 1] + 1;
     let samplePosition: number[] = [];
     samples.forEach((item, index) => {
       if (item.set !== lastSet) {
         samplePositionMap[lastSet] = samplePosition;
         lastSet = item.set;
-        iter = allQcPosition[allQcPosition.length-1] + 1;
+        iter = allQcPosition.length === 0 ? 0 : allQcPosition[allQcPosition.length - 1] + 1;
         samplePosition = [];
       }
       // item.index = index + 1;
@@ -338,7 +359,7 @@ const PlateDesign: React.FC = (props: any) => {
   const config = {
     xAxis: {
       label: {
-        style:{
+        style: {
           fill: 'black',
           fontSize: 12,
           fontWeight: 500,
@@ -347,7 +368,7 @@ const PlateDesign: React.FC = (props: any) => {
     },
     yAxis: {
       label: {
-        style:{
+        style: {
           fill: 'black',
           fontSize: 12,
           fontWeight: 500,
@@ -355,8 +376,8 @@ const PlateDesign: React.FC = (props: any) => {
       }
     },
     legend: {
-      itemName:{
-        style:{
+      itemName: {
+        style: {
           fill: 'black',
           fontSize: 12,
           fontWeight: 500
@@ -371,7 +392,8 @@ const PlateDesign: React.FC = (props: any) => {
     <>
       <Row gutter={[5, 5]}>
         <Col span={8}>
-          <Card size={"small"} extra={<Button onClick={onExportExcel} type={"primary"}><DownloadOutlined />Export</Button>}>
+          <Card size={"small"}
+                extra={<Button onClick={onExportExcel} type={"primary"}><DownloadOutlined/>Export</Button>}>
             <ProForm layout="horizontal" submitter={false}>
               <ProForm.Group>
                 <ProFormDigit readonly={true} label={"Total Samples"}>{props.sampleData?.length}</ProFormDigit>
@@ -424,8 +446,10 @@ const PlateDesign: React.FC = (props: any) => {
         </Col>
         <Col span={8}>
           <Card title={"Injection Order on Set No" + setNo} size={'small'}>
-            <Scatter height={200} autoFit={true} data={sortedSamples} xField={'index'} colorField={DimsEnum[intraBatchRandomDim]} size={5}
-                     yField={DimsEnum[intraBatchRandomDim]} shapeField={DimsEnum[intraBatchRandomDim]} {...config} legend={false}/>
+            <Scatter height={200} autoFit={true} data={sortedSamples} xField={'index'}
+                     colorField={DimsEnum[intraBatchRandomDim]} size={5}
+                     yField={DimsEnum[intraBatchRandomDim]} shapeField={DimsEnum[intraBatchRandomDim]} {...config}
+                     legend={false}/>
           </Card>
         </Col>
         <Col span={12}>
@@ -434,11 +458,10 @@ const PlateDesign: React.FC = (props: any) => {
             columns={plateCol}
             wellSize={plateSize}
             renderText={({index}) => {
-              return (
-                <div style={{fontSize: 12}}>
+              return <div style={{fontSize: 12}}>
                   <div>{index + 1}</div>
                 </div>
-              );
+              ;
             }}
             value={[0]}
             displayAsGrid={false}
@@ -452,7 +475,6 @@ const PlateDesign: React.FC = (props: any) => {
                 solventQcPosition,
                 blankQcPosition,
                 samplePositionMap[setNo]
-                // sampleData.filter(item => item.set === setNo).map(item=>item.index)
               )
             }
             }
@@ -464,12 +486,12 @@ const PlateDesign: React.FC = (props: any) => {
             columns={columns}
             actionRef={actionRef}
             //@ts-ignore
-            dataSource={dataSource.filter(data=>data.set === setNo)}
+            dataSource={dataSource.filter(data => data.set === setNo)}
             editable={{
               type: 'multiple',
             }}
             scroll={{
-              y: 400
+              y: 800
             }}
             columnsState={{
               persistenceKey: 'pro-table-singe-demos',
