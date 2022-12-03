@@ -1,5 +1,5 @@
 import {Space} from "antd";
-import {CloseSquareOutlined, TabletFilled} from "@ant-design/icons";
+import {TabletFilled} from "@ant-design/icons";
 
 export const Polarity = {
   Negative: { text: 'Negative', value: 'Negative' },
@@ -53,13 +53,19 @@ export const QCColors = {
 }
 
 export const QCType = {
+  'Custom': <Space><TabletFilled style={{ fontSize: '16px', color: QCColors.Custom }}/>Custom QC</Space>,
+  'LTR': <Space><TabletFilled style={{ fontSize: '16px', color: QCColors.LTR }}/>Long-Term Reference QC</Space>,
+  'Pooled': <Space><TabletFilled style={{ fontSize: '16px', color: QCColors.Pooled }}/>Pooled QC</Space>,
+  'Solvent': <Space><TabletFilled style={{ fontSize: '16px', color: QCColors.Solvent }}/>Solvent QC</Space>,
+  'Blank': <Space><TabletFilled style={{ fontSize: '16px', color: QCColors.Blank }}/>Blank QC</Space>,
+}
 
-  '1': <Space><TabletFilled style={{ fontSize: '16px', color: QCColors.Custom }}/>Custom QC</Space>,
-  '2': <Space><TabletFilled style={{ fontSize: '16px', color: QCColors.LTR }}/>Long-Term Reference QC</Space>,
-  '3': <Space><TabletFilled style={{ fontSize: '16px', color: QCColors.Pooled }}/>Pooled QC</Space>,
-  '4': <Space><TabletFilled style={{ fontSize: '16px', color: QCColors.Solvent }}/>Solvent QC</Space>,
-  '5': <Space><TabletFilled style={{ fontSize: '16px', color: QCColors.Blank }}/>Blank QC</Space>,
-  '6': <Space><CloseSquareOutlined />Clear</Space>,
+export const QCTypeEnum = {
+  "Custom":"Custom",
+  "LTR":"LTR",
+  "Pooled":"Pooled",
+  "Solvent":"Solvent",
+  "Blank":"Blank",
 }
 
 export const PlateTypeEnum = {

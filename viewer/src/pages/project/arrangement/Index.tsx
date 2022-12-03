@@ -28,7 +28,7 @@ import {
 } from 'antd';
 import type {Key} from 'react';
 import React, {useEffect, useRef, useState} from 'react';
-import {PlateNumber, PlateTypeEnum, QCColors, QCType} from '@/components/Enums/Const';
+import {PlateNumber, PlateTypeEnum, QCColors, QCType, QCTypeEnum} from '@/components/Enums/Const';
 
 import ExcelUpload from '@/pages/project/arrangement/ExcelUpload';
 import {getParam} from "@/utils/StringUtil";
@@ -83,11 +83,6 @@ const ProjectDetail: React.FC = () => {
   const [solventQcPosition, setSolventQcPosition] = useState<any[]>([]);
   const [ltrQcPosition, setLtrQcPosition] = useState<any[]>([]);
   const [blankQcPosition, setBlankQcPosition] = useState<any[]>([]);
-  const [customQcCount, setCustomQcCount] = useState<number>(0);
-  const [pooledQcCount, setPooledQcCount] = useState<number>(0);
-  const [solventQcCount, setSolventQcCount] = useState<number>(0);
-  const [ltrQcCount, setLtrQcCount] = useState<number>(0);
-  const [blankQcCount, setBlankQcCount] = useState<number>(0);
 
   const [plateType, setPlateType] = useState<string>('2');
   const [maxSamplesOnSinglePlate, setMaxSamplesOnSinglePlate] = useState<number>(96);
@@ -159,11 +154,11 @@ const ProjectDetail: React.FC = () => {
   }
 
   const getTotalCapacity = () => {
-    return maxSamplesOnSinglePlate + pooledQcCount + ltrQcCount + solventQcCount + customQcCount + blankQcCount
+    return maxSamplesOnSinglePlate + pooledQcPosition.length + ltrQcPosition.length + solventQcPosition.length + customQcPosition.length + blankQcPosition.length
   }
 
   const getCapacity = () => {
-    return pooledQcCount + ltrQcCount + solventQcCount + customQcCount + blankQcCount
+    return pooledQcPosition.length + ltrQcPosition.length + solventQcPosition.length + customQcPosition.length + blankQcPosition.length
   }
 
   const judgeIfOutOfIndex = () => {
@@ -231,15 +226,10 @@ const ProjectDetail: React.FC = () => {
 
   const buildQCInfo = (customQcP: number[], blankQcP: number[], ltrQcP: number[], solventQcP: number[], pooledQcP: number[]) => {
     setCustomQcPosition(customQcP);
-    setCustomQcCount(customQcP.length);
     setBlankQcPosition(blankQcP);
-    setBlankQcCount(blankQcP.length);
     setLtrQcPosition(ltrQcP);
-    setLtrQcCount(ltrQcP.length);
     setSolventQcPosition(solventQcP);
-    setSolventQcCount(solventQcP.length);
     setPooledQcPosition(pooledQcP);
-    setPooledQcCount(pooledQcP.length);
     setJudge(judge + 1);
   }
 
@@ -469,12 +459,12 @@ const ProjectDetail: React.FC = () => {
                   }}
                   name="basic"
                   layout="vertical"
+                  submitter={false}
                   initialValues={{
                     plateNumber,
                     maxSamplesOnSinglePlate,
                     plateType,
-                  }}
-                  submitter={false}>
+                  }}>
                   <ProForm.Group>
                     <ProFormSelect rules={[{required: true, message: 'required'}]} width={150} name="plateType"
                                    label={"Plate"} valueEnum={PlateTypeEnum}
@@ -509,22 +499,22 @@ const ProjectDetail: React.FC = () => {
                     <ProFormSelect rules={[{required: true, message: 'required'}]} width={150} name="plateNumber"
                                    label={"Plate Number"} valueEnum={PlateNumber}
                                    fieldProps={{
-                                     onSelect: function (label: PositionFormat) {
+                                     onSelect: (label: PositionFormat) => {
                                        setPlateNumber(label);
                                      }
                                    }}/>
                     <Space direction={"vertical"}>
                       <Space><TabletFilled
-                        style={{fontSize: '24px', color: QCColors.Custom}}/><b>{customQcCount}</b> Custom QC</Space>
+                        style={{fontSize: '24px', color: QCColors.Custom}}/><b>{customQcPosition.length}</b> Custom QC</Space>
                       <Space><TabletFilled
-                        style={{fontSize: '24px', color: QCColors.LTR}}/><b>{ltrQcCount}</b> Long-Term Reference
+                        style={{fontSize: '24px', color: QCColors.LTR}}/><b>{ltrQcPosition.length}</b> Long-Term Reference
                         QC</Space>
                       <Space><TabletFilled
-                        style={{fontSize: '24px', color: QCColors.Pooled}}/><b>{pooledQcCount}</b> Pooled QC</Space>
+                        style={{fontSize: '24px', color: QCColors.Pooled}}/><b>{pooledQcPosition.length}</b> Pooled QC</Space>
                       <Space><TabletFilled
-                        style={{fontSize: '24px', color: QCColors.Solvent}}/><b>{solventQcCount}</b> Solvent QC</Space>
+                        style={{fontSize: '24px', color: QCColors.Solvent}}/><b>{solventQcPosition.length}</b> Solvent QC</Space>
                       <Space><TabletFilled
-                        style={{fontSize: '24px', color: QCColors.Blank}}/><b>{blankQcCount}</b> Blank QC</Space>
+                        style={{fontSize: '24px', color: QCColors.Blank}}/><b>{blankQcPosition.length}</b> Blank QC</Space>
                     </Space>
                   </ProForm.Group>
                 </ProForm>
@@ -539,25 +529,20 @@ const ProjectDetail: React.FC = () => {
                                  const selectedPositions = selectedValues.map(value => value + 1);
                                  removeFromOther(selectedPositions);
                                  switch (label) {
-                                   case "1": // Custom QC
+                                   case QCTypeEnum.Custom: // Custom QC
                                      setCustomQcPosition(selectedPositions);
-                                     setCustomQcCount(selectedPositions.length);
                                      break;
-                                   case "2": //Long-Term Reference QC
+                                   case QCTypeEnum.LTR: //Long-Term Reference QC
                                      setLtrQcPosition(selectedPositions);
-                                     setLtrQcCount(selectedPositions.length);
                                      break;
-                                   case "3": //Pooled QC
+                                   case QCTypeEnum.Pooled: //Pooled QC
                                      setPooledQcPosition(selectedPositions);
-                                     setPooledQcCount(selectedPositions.length);
                                      break;
-                                   case "4": //Solvent QC
+                                   case QCTypeEnum.Solvent: //Solvent QC
                                      setSolventQcPosition(selectedPositions);
-                                     setSolventQcCount(selectedPositions.length)
                                      break;
-                                   case "5": //Blank QC
+                                   case QCTypeEnum.Blank: //Blank QC
                                      setBlankQcPosition(selectedPositions);
-                                     setBlankQcCount(selectedPositions.length);
                                      break;
                                    default:
                                      break;
@@ -614,7 +599,6 @@ const ProjectDetail: React.FC = () => {
       //@ts-ignore
       content: <WorkSheet randomSample={randomSampleRes} setTargetKey={setTargetKeys} setSelectBatch={setSelectBatch}
                           setInjectTemplate={setInjectTemplate}/>
-
     },
     {
       title: "Finish",

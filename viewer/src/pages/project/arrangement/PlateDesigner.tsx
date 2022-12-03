@@ -11,7 +11,7 @@ import {PositionFormat} from "well-plates";
 import type {ActionType} from "@ant-design/pro-table";
 import {blockRandom, completeRandom, randomBalance, stratifiedBalance} from "@/utils/CommonUtil";
 import {Column, Scatter} from "@ant-design/charts";
-import {BalanceMethodEnum, DimsEnum, QCColors, RandomMethodEnum} from "@/components/Enums/Const";
+import {BalanceMethodEnum, DimsEnum, QCColors, QCTypeEnum, RandomMethodEnum} from "@/components/Enums/Const";
 import type {Sample, SampleSequence} from "@/domains/Sample.d";
 import ProForm, {ProFormDigit} from "@ant-design/pro-form";
 import {ProFormSelect} from "@ant-design/pro-form";
@@ -26,7 +26,6 @@ const PlateDesign: React.FC = (props: any) => {
 
   const [setNo, setSetNo] = useState(1);
   const [dataSource, setDataSource] = useState([])
-  const [boardIndex, setBoardIndex] = useState([0])
   const [sortedSamples, setSortedSamples] = useState<Record<string, any>[]>([])
   const [setSamples, setSetSamples] = useState<any[]>([])
   const [interBatchBalanceMethod, setInterBatchBalanceMethod] = useState<string>('2')
@@ -35,15 +34,20 @@ const PlateDesign: React.FC = (props: any) => {
   const [intraBatchRandomDim, setIntraBatchRandomDim] = useState<string>('1')
   const [plateRow, setPlateRow] = useState<number>(8)
   const [plateCol, setPlateCol] = useState<number>(12)
-  const [plateSize, setPlateSize] = useState<number>(40)
-  const [plateFormat, setPlateFormat] = useState<PositionFormat>(PositionFormat.LetterNumber)
+  const [wellSize, setWellSize] = useState<number>(40)
+  const [yaxisFormat, setYaxisFormat] = useState<PositionFormat>(PositionFormat.LetterNumber)
   const [sampleData, setSampleData] = useState<any[]>([])
   const [plateCountArr, setPlateCountArr] = useState<number[]>([])
   const [plateCount, setPlateCount] = useState<number>(1)
 
   const getAllQcPosition = () => {
-    return props.customQcPosition.concat(props.pooledQcPosition).concat(props.solventQcPosition).concat(props.ltrQcPosition).concat(props.blankQcPosition)
+    return [...props.customQcPosition,
+      ...props.pooledQcPosition,
+      ...props.solventQcPosition,
+      ...props.ltrQcPosition,
+      ...props.blankQcPosition]
   }
+
   const [customQcPosition] = useState<number[]>(props.customQcPosition);
   const [pooledQcPosition] = useState<number[]>(props.pooledQcPosition);
   const [solventQcPosition] = useState<number[]>(props.solventQcPosition);
@@ -52,12 +56,12 @@ const PlateDesign: React.FC = (props: any) => {
   const [samplePositionMap, setSamplePositionMap] = useState<any>({});
   const [allQcPosition] = useState<number[]>(getAllQcPosition().sort((a: number, b: number) => a - b));
 
-  const actionRef = useRef<ActionType>();
+  const tableRef = useRef<ActionType>();
 
   function buildPlateType(row: number, col: number, size: number) {
     setPlateRow(row);
     setPlateCol(col);
-    setPlateSize(size);
+    setWellSize(size);
   }
 
   function setPropsSample(samples: any[]) {
@@ -76,6 +80,13 @@ const PlateDesign: React.FC = (props: any) => {
       render: (text) => {
         return <Tag color={"gray"} style={{borderRadius: "70%"}}>{text}</Tag>;
       },
+    },
+    {
+      key: 'Set No',
+      title: 'Set No',
+      dataIndex: 'set',
+      ellipsis: true,
+      width: 80,
     },
     {
       key: 'type',
@@ -118,13 +129,6 @@ const PlateDesign: React.FC = (props: any) => {
       search: false,
     },
     {
-      key: 'Set No',
-      title: 'Set No',
-      dataIndex: 'set',
-      ellipsis: true,
-      width: 80,
-    },
-    {
       key: 'dim1',
       title: 'dim1',
       dataIndex: 'dim1',
@@ -161,7 +165,7 @@ const PlateDesign: React.FC = (props: any) => {
       default:
         buildPlateType(8, 12, 40);
     }
-    setPlateFormat(props.plateNumber);
+    setYaxisFormat(props.plateNumber);
 
     let pCount: number | undefined;
     if (props.sampleData?.length) {
@@ -260,8 +264,8 @@ const PlateDesign: React.FC = (props: any) => {
 
     setSetSamples(sampleStat);
     setSortedSamples(JSON.parse(JSON.stringify(sampleData)).filter((data: Record<string, any>) => data.set === setNo));
-
     setPropsSample(newSampleData);
+
   }, [sampleData])
 
   useEffect(() => {
@@ -275,7 +279,7 @@ const PlateDesign: React.FC = (props: any) => {
    * @param comma
    * @constructor
    */
-  function GenList(key1: number[], key2: any[], comma: string) {
+  function GenerateList(key1: number[], key2: any[], comma: string) {
     const newArr = [];
     for (const a of key2) {
       for (const b of key1) {
@@ -298,27 +302,31 @@ const PlateDesign: React.FC = (props: any) => {
       return index + 1;
     });
     let rowArr;
-    if (plateFormat === PositionFormat.Sequential) {
+    if (yaxisFormat === PositionFormat.Sequential) {
       rowArr = new Array(plateRow).toString().split(',').map(function (item, index) {
         return index + 1;
       });
     }
-    if (plateFormat === PositionFormat.LetterNumber) {
+    if (yaxisFormat === PositionFormat.LetterNumber) {
       rowArr = [...Array(plateRow).keys()].map(i => String.fromCharCode(i + 65))
     }
     // @ts-ignore
-    const platePositionList = GenList(colArr, rowArr, ":");
+    const platePositionList = GenerateList(colArr, rowArr, ":");
 
-    let lastSet: any;
-
+    let lastSet: any = 1;
     let iter = allQcPosition.length === 0 ? 0 : allQcPosition[allQcPosition.length - 1] + 1;
     let samplePosition: number[] = [];
     samples.forEach((item, index) => {
+      //开始创新一块新板子
       if (item.set !== lastSet) {
+        //Step1.将上一块板子的位置信息放到Map中
         samplePositionMap[lastSet] = samplePosition;
+        //Step2.设定当前新板子的信息
         lastSet = item.set;
         iter = allQcPosition.length === 0 ? 0 : allQcPosition[allQcPosition.length - 1] + 1;
         samplePosition = [];
+        //Step3.初始化QC样品
+        BuildQcSamples(setNo);
       }
       // item.index = index + 1;
       item.index = iter;
@@ -326,8 +334,35 @@ const PlateDesign: React.FC = (props: any) => {
       samplePosition.push(iter);
       iter++;
     })
+    samplePositionMap[lastSet] = samplePosition;
     setSamplePositionMap(samplePositionMap);
     return samples;
+  }
+
+  function BuildQcSamples(setNo: number) {
+    const qcSamples: any[] = [];
+
+    blankQcPosition.forEach(position => {
+      qcSamples.push({index: position, type: QCTypeEnum.Blank, set: setNo});
+    })
+
+    solventQcPosition.forEach(position => {
+      qcSamples.push({index: position, type: QCTypeEnum.Solvent, set: setNo});
+    })
+
+    customQcPosition.forEach(position => {
+      qcSamples.push({index: position, type: QCTypeEnum.Custom, set: setNo});
+    })
+
+    ltrQcPosition.forEach(position => {
+      qcSamples.push({index: position, type: QCTypeEnum.LTR, set: setNo});
+    })
+
+    pooledQcPosition.forEach(position => {
+      qcSamples.push({index: position, type: QCTypeEnum.Pooled, set: setNo});
+    })
+
+    return qcSamples;
   }
 
   function StateFullWellPicker(pickerProps: IStateFullWellPickerProps) {
@@ -336,7 +371,6 @@ const PlateDesign: React.FC = (props: any) => {
 
     return <MultiWellPicker value={value} onChange={(value1) => {
       setValue(value1)
-      setBoardIndex(value1)
     }} {...otherProps} />;
   }
 
@@ -456,16 +490,11 @@ const PlateDesign: React.FC = (props: any) => {
           <StateFullWellPicker
             rows={plateRow}
             columns={plateCol}
-            wellSize={plateSize}
-            renderText={({index}) => {
-              return <div style={{fontSize: 12}}>
-                  <div>{index + 1}</div>
-                </div>
-              ;
-            }}
+            wellSize={wellSize}
+            renderText={({index}) => <div style={{fontSize: 12}}>{index + 1}</div>}
             value={[0]}
             displayAsGrid={false}
-            format={plateFormat}
+            format={yaxisFormat}
             rangeSelectionMode={RangeSelectionMode.zone}
             style={({index, wellPlate, disabled, booked, selected}) => {
               return buildStyles({index, wellPlate, disabled, booked, selected},
@@ -484,7 +513,7 @@ const PlateDesign: React.FC = (props: any) => {
           <ProTable<SampleSequence>
             size={'small'}
             columns={columns}
-            actionRef={actionRef}
+            actionRef={tableRef}
             //@ts-ignore
             dataSource={dataSource.filter(data => data.set === setNo)}
             editable={{
@@ -502,29 +531,6 @@ const PlateDesign: React.FC = (props: any) => {
             options={{
               setting: {
                 listsHeight: 400,
-              },
-            }}
-            rowClassName={(record, index) => {
-              if (boardIndex[0] % 20 === index) {
-                return `${styles.tableActiveRow}`
-              }
-              if (index == 0) {
-                // return `${styles.tableActiveRow}`
-                return ''
-              } else {
-                return ''
-              }
-            }}
-            form={{
-              // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-              syncToUrl: (values, type) => {
-                if (type === 'get') {
-                  return {
-                    ...values,
-                    created_at: [values.startTime, values.endTime],
-                  };
-                }
-                return values;
               },
             }}
             pagination={false}
