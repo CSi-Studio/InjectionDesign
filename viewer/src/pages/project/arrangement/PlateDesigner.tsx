@@ -64,6 +64,8 @@ const PlateDesign: React.FC = (props: any) => {
     setWellSize(size);
   }
 
+  const platePositionList = GenerateList();
+
   function setPropsSample(samples: any[]) {
     props.setRandomSampleRes({
       sampleData: samples,
@@ -104,7 +106,7 @@ const PlateDesign: React.FC = (props: any) => {
           case 'Pooled':
             return <Tag color={QCColors.Pooled}>{text}</Tag>;
           case 'LTR':
-            return <Tag color={QCColors.Blank}>{text}</Tag>;
+            return <Tag color={QCColors.LTR}>{text}</Tag>;
           case 'Custom':
             return <Tag color={QCColors.Custom}>{text}</Tag>;
         }
@@ -274,16 +276,26 @@ const PlateDesign: React.FC = (props: any) => {
 
   /**
    * 两个样本求排列
-   * @param key1
-   * @param key2
-   * @param comma
-   * @constructor
    */
-  function GenerateList(key1: number[], key2: any[], comma: string) {
+  function GenerateList() {
+
+    const colArr = new Array(plateCol).toString().split(',').map(function (item, index) {
+      return index + 1;
+    });
+    let rowArr: any[] = [];
+    if (yaxisFormat === PositionFormat.Sequential) {
+      rowArr = new Array(plateRow).toString().split(',').map(function (item, index) {
+        return index + 1;
+      });
+    }
+    if (yaxisFormat === PositionFormat.LetterNumber) {
+      rowArr = [...Array(plateRow).keys()].map(i => String.fromCharCode(i + 65))
+    }
+
     const newArr = [];
-    for (const a of key2) {
-      for (const b of key1) {
-        newArr.push(a + comma + b)
+    for (const a of rowArr) {
+      for (const b of colArr) {
+        newArr.push(a + ":" + b)
       }
     }
     return newArr;
@@ -298,46 +310,30 @@ const PlateDesign: React.FC = (props: any) => {
     if (samples.length === 0) {
       return [];
     }
-    const colArr = new Array(plateCol).toString().split(',').map(function (item, index) {
-      return index + 1;
-    });
-    let rowArr;
-    if (yaxisFormat === PositionFormat.Sequential) {
-      rowArr = new Array(plateRow).toString().split(',').map(function (item, index) {
-        return index + 1;
-      });
-    }
-    if (yaxisFormat === PositionFormat.LetterNumber) {
-      rowArr = [...Array(plateRow).keys()].map(i => String.fromCharCode(i + 65))
-    }
-    // @ts-ignore
-    const platePositionList = GenerateList(colArr, rowArr, ":");
 
-    let lastSet: any = 1;
     let iter = getLastQcPosition();
-    let samplePosition: number[] = [];
-    let qcSamplesGroup: any[] = [];
-    samples.forEach((item, index) => {
-      //开始创新一块新板子
-      if (item.set !== lastSet) {
-        //Step1.将上一块板子的位置信息放到Map中
-        samplePositionMap[lastSet] = samplePosition;
-        //Step2.设定当前新板子的信息
-        lastSet = item.set;
-        iter = getLastQcPosition();
-        samplePosition = [];
-        //Step3.初始化QC样品
-        qcSamplesGroup.concat(BuildQcSamples(setNo));
-      }
-      item.index = iter;
-      item.position = platePositionList[iter];
-      samplePosition.push(iter);
-      iter++;
+    let totalSamples: any[] = [];
+    const samplesSetMap = groupBy(samples,'set');
+    Object.entries(samplesSetMap).forEach((entry)=>{
+      const currentSetNo = Number(entry[0]);
+      const values = entry[1];
+      iter = getLastQcPosition();
+      let samplePosition: number[] = [];
+      let qcSamples = BuildQcSamples(currentSetNo);
+      values.forEach(value=>{
+        value.index = iter;
+        value.position = platePositionList[iter];
+        if (value.type === "Normal"){
+          samplePosition.push(iter);
+        }
+        iter++
+      })
+      samplePositionMap[currentSetNo] = samplePosition;
+      totalSamples = totalSamples.concat(qcSamples.concat(values));
     })
-    samplePositionMap[lastSet] = samplePosition;
+
     setSamplePositionMap(samplePositionMap);
-    samples.concat(qcSamplesGroup);
-    return samples;
+    return totalSamples;
   }
 
   function getLastQcPosition() {
@@ -348,23 +344,23 @@ const PlateDesign: React.FC = (props: any) => {
     const qcSamples: any[] = [];
 
     blankQcPosition.forEach(position => {
-      qcSamples.push({index: position, type: QCTypeEnum.Blank, set: setNo});
+      qcSamples.push({index: position, position: platePositionList[position], type: QCTypeEnum.Blank, set: setNo});
     })
 
     solventQcPosition.forEach(position => {
-      qcSamples.push({index: position, type: QCTypeEnum.Solvent, set: setNo});
+      qcSamples.push({index: position, position: platePositionList[position], type: QCTypeEnum.Solvent, set: setNo});
     })
 
     customQcPosition.forEach(position => {
-      qcSamples.push({index: position, type: QCTypeEnum.Custom, set: setNo});
+      qcSamples.push({index: position, position: platePositionList[position], type: QCTypeEnum.Custom, set: setNo});
     })
 
     ltrQcPosition.forEach(position => {
-      qcSamples.push({index: position, type: QCTypeEnum.LTR, set: setNo});
+      qcSamples.push({index: position, position: platePositionList[position], type: QCTypeEnum.LTR, set: setNo});
     })
 
     pooledQcPosition.forEach(position => {
-      qcSamples.push({index: position, type: QCTypeEnum.Pooled, set: setNo});
+      qcSamples.push({index: position, position: platePositionList[position], type: QCTypeEnum.Pooled, set: setNo});
     })
 
     return qcSamples;

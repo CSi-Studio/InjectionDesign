@@ -68,7 +68,7 @@ const ProjectDetail: React.FC = () => {
 
   const [plateRow, setPlateRow] = useState<number>(8);
   const [plateCol, setPlateCol] = useState<number>(12);
-  const [wellSize, setWellSize] = useState<number>(50);
+  const [wellSize, setWellSize] = useState<number>(60);
 
   const [paramsSizeError, setParamsSizeError] = useState<string>();
   const [plateCount, setPlateCount] = useState<number>(1); //需要的板子数目
@@ -590,25 +590,30 @@ const ProjectDetail: React.FC = () => {
           </Col>
           <Col span={10}>
             <Space direction={"vertical"} style={{marginBottom:10}}>
-              <Space><TabletFilled style={{fontSize: "24px",color: QCColors.Custom}}/><b>{customQcPosition.length}</b> Custom QC
+              <Space>
                 <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.Custom)}>Add</Button>
                 <Button danger onClick={()=>clearQcPosition(QCTypeEnum.Custom)}>Clear</Button>
+                <TabletFilled style={{fontSize: "24px",color: QCColors.Custom}}/><b>{customQcPosition.length}</b> Custom QC
               </Space>
-              <Space><TabletFilled style={{fontSize: "24px",color: QCColors.LTR}}/><b>{ltrQcPosition.length}</b> Long-Term Reference QC
+              <Space>
                 <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.LTR)}>Add</Button>
                 <Button danger onClick={()=>clearQcPosition(QCTypeEnum.LTR)}>Clear</Button>
+                <TabletFilled style={{fontSize: "24px",color: QCColors.LTR}}/><b>{ltrQcPosition.length}</b> Long-Term Reference QC
               </Space>
-              <Space><TabletFilled style={{fontSize: "24px",color: QCColors.Pooled}}/><b>{pooledQcPosition.length}</b> Pooled QC
+              <Space>
                 <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.Pooled)}>Add</Button>
                 <Button danger onClick={()=>clearQcPosition(QCTypeEnum.Pooled)}>Clear</Button>
+                <TabletFilled style={{fontSize: "24px",color: QCColors.Pooled}}/><b>{pooledQcPosition.length}</b> Pooled QC
               </Space>
-              <Space><TabletFilled style={{fontSize: "24px",color: QCColors.Solvent}}/><b>{solventQcPosition.length}</b> Solvent QC
+              <Space>
                 <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.Solvent)}>Add</Button>
                 <Button danger onClick={()=>clearQcPosition(QCTypeEnum.Solvent)}>Clear</Button>
+                <TabletFilled style={{fontSize: "24px",color: QCColors.Solvent}}/><b>{solventQcPosition.length}</b> Solvent QC
               </Space>
-              <Space><TabletFilled style={{fontSize: "24px",color: QCColors.Blank}}/><b>{blankQcPosition.length}</b> Blank QC
+              <Space>
                 <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.Blank)}>Add</Button>
                 <Button danger onClick={()=>clearQcPosition(QCTypeEnum.Blank)}>Clear</Button>
+                <TabletFilled style={{fontSize: "24px",color: QCColors.Blank}}/><b>{blankQcPosition.length}</b> Blank QC
               </Space>
               <Button danger onClick={()=>clearQcPosition()}>Clear All</Button>
             </Space>
