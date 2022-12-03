@@ -111,7 +111,7 @@ const PlateDesign: React.FC = (props: any) => {
             return <Tag color={QCColors.Custom}>{text}</Tag>;
         }
         return;
-      },
+      }
     },
     {
       key: 'well',
@@ -311,22 +311,20 @@ const PlateDesign: React.FC = (props: any) => {
       return [];
     }
 
-    let iter = getLastQcPosition();
     let totalSamples: any[] = [];
-    const samplesSetMap = groupBy(samples,'set');
-    Object.entries(samplesSetMap).forEach((entry)=>{
+    const samplesSetMap = groupBy(samples, 'set');
+    Object.entries(samplesSetMap).forEach((entry) => {
       const currentSetNo = Number(entry[0]);
       const values = entry[1];
-      iter = getLastQcPosition();
+      let nextPosition = getNextEmptyPosition(1);
       let samplePosition: number[] = [];
       let qcSamples = BuildQcSamples(currentSetNo);
-      values.forEach(value=>{
-        value.index = iter;
-        value.position = platePositionList[iter];
-        if (value.type === "Normal"){
-          samplePosition.push(iter);
-        }
-        iter++
+      values.forEach((value, index) => {
+        value.index = nextPosition;
+        value.position = platePositionList[nextPosition];
+        samplePosition.push(nextPosition);
+        nextPosition++;
+        nextPosition = getNextEmptyPosition(nextPosition);
       })
       samplePositionMap[currentSetNo] = samplePosition;
       totalSamples = totalSamples.concat(qcSamples.concat(values));
@@ -336,8 +334,11 @@ const PlateDesign: React.FC = (props: any) => {
     return totalSamples;
   }
 
-  function getLastQcPosition() {
-    return allQcPosition.length === 0 ? 1 : allQcPosition[allQcPosition.length - 1] + 1;
+  function getNextEmptyPosition(iter: number) {
+    while (allQcPosition.indexOf(iter) > -1) {
+      iter++;
+    }
+    return iter;
   }
 
   function BuildQcSamples(setNo: number) {
