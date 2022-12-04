@@ -20,6 +20,7 @@ import * as ExcelJs from 'exceljs';
 import {generateHeaders, saveWorkbook} from "@/utils/ExcelUtils";
 import {DownloadOutlined} from "@ant-design/icons";
 import {buildStyles} from "@/pages/arrangement/manager/util/PlateStyle";
+import {IterationOrder} from "_well-plates@6.0.3@well-plates";
 
 type IStateFullWellPickerProps = Omit<IWellPickerProps, 'onChange'>;
 const PlateDesign: React.FC = (props: any) => {
@@ -39,6 +40,7 @@ const PlateDesign: React.FC = (props: any) => {
   const [sampleData, setSampleData] = useState<any[]>([])
   const [plateCountArr, setPlateCountArr] = useState<number[]>([])
   const [plateCount, setPlateCount] = useState<number>(1)
+  const [direction] = useState<string>(props.direction)
 
   const getAllQcPosition = () => {
     return [...props.customQcPosition,
@@ -278,7 +280,6 @@ const PlateDesign: React.FC = (props: any) => {
    * 两个样本求排列
    */
   function GenerateList() {
-
     const colArr = new Array(plateCol).toString().split(',').map(function (item, index) {
       return index + 1;
     });
@@ -293,11 +294,20 @@ const PlateDesign: React.FC = (props: any) => {
     }
 
     const newArr = [];
-    for (const a of rowArr) {
+    if (direction === "Horizontal") {
+      for (const a of rowArr) {
+        for (const b of colArr) {
+          newArr.push(a + ":" + b)
+        }
+      }
+    } else {
       for (const b of colArr) {
-        newArr.push(a + ":" + b)
+        for (const a of rowArr) {
+          newArr.push(a + ":" + b)
+        }
       }
     }
+
     return newArr;
   }
 
@@ -497,6 +507,7 @@ const PlateDesign: React.FC = (props: any) => {
             value={[0]}
             displayAsGrid={false}
             format={yaxisFormat}
+            order={direction === "Vertical" ? IterationOrder.ByRow : IterationOrder.ByColumn}
             rangeSelectionMode={RangeSelectionMode.zone}
             style={({index, wellPlate, disabled, booked, selected}) => {
               return buildStyles({index, wellPlate, disabled, booked, selected},

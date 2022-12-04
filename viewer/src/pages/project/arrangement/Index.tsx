@@ -4,31 +4,16 @@ import {buildColumn} from '@/pages/project/arrangement/Column';
 import PreOrderService from '@/services/PreOrderService';
 import SampleService from '@/services/SampleService';
 import {url} from '@/utils/request';
-import {
-  DeleteOutlined,
-  DownloadOutlined,
-  TabletFilled,
-  UploadOutlined,
-} from '@ant-design/icons';
+import {DeleteOutlined, DownloadOutlined, TabletFilled, UploadOutlined,} from '@ant-design/icons';
 import {ProForm} from '@ant-design/pro-components';
 import type {ProFormInstance} from '@ant-design/pro-form';
 import {ProFormDigit} from '@ant-design/pro-form';
 import type {ActionType} from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import {
-  Alert,
-  Button,
-  Card,
-  Col,
-  message,
-  Modal,
-  Row,
-  Space,
-  Steps,
-} from 'antd';
+import {Alert, Button, Card, Col, message, Modal, Row, Space, Steps,} from 'antd';
 import type {Key} from 'react';
 import React, {useEffect, useRef, useState} from 'react';
-import {PlateNumber, PlateTypeEnum, QCColors, QCTypeEnum} from '@/components/Enums/Const';
+import {Direction, PlateNumber, PlateTypeEnum, QCColors, QCTypeEnum} from '@/components/Enums/Const';
 
 import ExcelUpload from '@/pages/project/arrangement/ExcelUpload';
 import {getParam} from "@/utils/StringUtil";
@@ -39,7 +24,7 @@ import {groupByAndCount4Samples, groupBySample} from "@/utils/CommonUtil";
 import {Column} from "@ant-design/charts";
 import PlateDesign from "@/pages/project/arrangement/PlateDesigner";
 import {MultiWellPicker} from "@/pages/arrangement/manager/WellPicker";
-import {PositionFormat} from "well-plates";
+import {IterationOrder, PositionFormat} from "well-plates";
 import WorkSheet from "@/pages/project/arrangement/WorkSheet";
 import Preview from "@/pages/project/arrangement/PreView";
 import {buildStyles} from "@/pages/arrangement/manager/util/PlateStyle";
@@ -87,6 +72,7 @@ const ProjectDetail: React.FC = () => {
   const [plateType, setPlateType] = useState<string>('2');
   const [maxSamplesOnSinglePlate, setMaxSamplesOnSinglePlate] = useState<number>(96);
   const [plateNumber, setPlateNumber] = useState<PositionFormat>(PositionFormat.LetterNumber);
+  const [plateDirection, setPlateDirection] = useState<string>("Vertical");
 
   // randomization return
   const [randomSampleRes, setRandomSampleRes] = useState<any>({});
@@ -378,7 +364,7 @@ const ProjectDetail: React.FC = () => {
     }
   }
 
-  const clearQcPosition = (label?: string) =>{
+  const clearQcPosition = (label?: string) => {
     switch (label) {
       case QCTypeEnum.Custom: // Custom QC
         setCustomQcPosition([]);
@@ -396,13 +382,13 @@ const ProjectDetail: React.FC = () => {
         setBlankQcPosition([]);
         break;
       default:
-        buildQCInfo([],[],[],[],[]);
+        buildQCInfo([], [], [], [], []);
         break;
     }
-    setJudge(judge+1)
+    setJudge(judge + 1)
   }
 
-  const onQcPositionSelected = (label?: string) =>{
+  const onQcPositionSelected = (label?: string) => {
     if (selectedValues && selectedValues.length > 0) {
       const selectedPositions = selectedValues.map(value => value + 1);
       removeFromOther(selectedPositions);
@@ -555,7 +541,14 @@ const ProjectDetail: React.FC = () => {
                                        setPlateNumber(label);
                                      }
                                    }}/>
-
+                    <ProFormSelect rules={[{required: true, message: 'required'}]} width={150} name="direction"
+                                   label={"Direction"} valueEnum={Direction} initialValue={plateDirection}
+                                   fieldProps={{
+                                     onSelect: (label: string) => {
+                                       setPlateDirection(label);
+                                       buildQCInfo([],[],[],[],[])
+                                     }
+                                   }}/>
                   </ProForm.Group>
                 </ProForm>
               </Col>
@@ -564,6 +557,7 @@ const ProjectDetail: React.FC = () => {
           <Col span={10}>
             <MultiWellPicker value={selectedValues} rows={plateRow} columns={plateCol} wellSize={wellSize}
                              format={plateNumber}
+                             order={plateDirection === "Vertical" ? IterationOrder.ByRow : IterationOrder.ByColumn}
                              style={({index, wellPlate, disabled, booked, selected}) => {
                                return buildStyles({index, wellPlate, disabled, booked, selected},
                                  customQcPosition,
@@ -589,33 +583,38 @@ const ProjectDetail: React.FC = () => {
                              }}/>
           </Col>
           <Col span={10}>
-            <Space direction={"vertical"} style={{marginBottom:10}}>
+            <Space direction={"vertical"} style={{marginBottom: 10}}>
               <Space>
-                <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.Custom)}>Add</Button>
-                <Button danger onClick={()=>clearQcPosition(QCTypeEnum.Custom)}>Clear</Button>
-                <TabletFilled style={{fontSize: "24px",color: QCColors.Custom}}/><b>{customQcPosition.length}</b> Custom QC
+                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Custom)}>Add</Button>
+                <Button danger onClick={() => clearQcPosition(QCTypeEnum.Custom)}>Clear</Button>
+                <TabletFilled
+                  style={{fontSize: "24px", color: QCColors.Custom}}/><b>{customQcPosition.length}</b> Custom QC
               </Space>
               <Space>
-                <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.LTR)}>Add</Button>
-                <Button danger onClick={()=>clearQcPosition(QCTypeEnum.LTR)}>Clear</Button>
-                <TabletFilled style={{fontSize: "24px",color: QCColors.LTR}}/><b>{ltrQcPosition.length}</b> Long-Term Reference QC
+                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.LTR)}>Add</Button>
+                <Button danger onClick={() => clearQcPosition(QCTypeEnum.LTR)}>Clear</Button>
+                <TabletFilled style={{fontSize: "24px", color: QCColors.LTR}}/><b>{ltrQcPosition.length}</b> Long-Term
+                Reference QC
               </Space>
               <Space>
-                <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.Pooled)}>Add</Button>
-                <Button danger onClick={()=>clearQcPosition(QCTypeEnum.Pooled)}>Clear</Button>
-                <TabletFilled style={{fontSize: "24px",color: QCColors.Pooled}}/><b>{pooledQcPosition.length}</b> Pooled QC
+                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Pooled)}>Add</Button>
+                <Button danger onClick={() => clearQcPosition(QCTypeEnum.Pooled)}>Clear</Button>
+                <TabletFilled
+                  style={{fontSize: "24px", color: QCColors.Pooled}}/><b>{pooledQcPosition.length}</b> Pooled QC
               </Space>
               <Space>
-                <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.Solvent)}>Add</Button>
-                <Button danger onClick={()=>clearQcPosition(QCTypeEnum.Solvent)}>Clear</Button>
-                <TabletFilled style={{fontSize: "24px",color: QCColors.Solvent}}/><b>{solventQcPosition.length}</b> Solvent QC
+                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Solvent)}>Add</Button>
+                <Button danger onClick={() => clearQcPosition(QCTypeEnum.Solvent)}>Clear</Button>
+                <TabletFilled
+                  style={{fontSize: "24px", color: QCColors.Solvent}}/><b>{solventQcPosition.length}</b> Solvent QC
               </Space>
               <Space>
-                <Button type={'primary'} onClick={()=>onQcPositionSelected(QCTypeEnum.Blank)}>Add</Button>
-                <Button danger onClick={()=>clearQcPosition(QCTypeEnum.Blank)}>Clear</Button>
-                <TabletFilled style={{fontSize: "24px",color: QCColors.Blank}}/><b>{blankQcPosition.length}</b> Blank QC
+                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Blank)}>Add</Button>
+                <Button danger onClick={() => clearQcPosition(QCTypeEnum.Blank)}>Clear</Button>
+                <TabletFilled style={{fontSize: "24px", color: QCColors.Blank}}/><b>{blankQcPosition.length}</b> Blank
+                QC
               </Space>
-              <Button danger onClick={()=>clearQcPosition()}>Clear All</Button>
+              <Button danger onClick={() => clearQcPosition()}>Clear All</Button>
             </Space>
           </Col>
         </Row>
@@ -631,6 +630,7 @@ const ProjectDetail: React.FC = () => {
                             pooledQcPosition={pooledQcPosition}
                             solventQcPosition={solventQcPosition}
                             ltrQcPosition={ltrQcPosition}
+                            direction={plateDirection}
                             sampleData={sampleData} setRandomSampleRes={setRandomSampleRes}/>
     },
     {

@@ -13,6 +13,7 @@ import { WellPlate, SubsetMode } from 'well-plates';
 
 import type { Cell } from './WellPlate';
 import { WellPlateInternal } from './util/WellPlateInternal';
+import {IterationOrder} from "_well-plates@6.0.3@well-plates";
 
 export enum RangeSelectionMode {
   columns = 'columns',
@@ -58,6 +59,7 @@ export interface IWellPickerProps {
   rows: number;
   columns: number;
   format?: PositionFormat;
+  order?: IterationOrder;
   value: (number | string)[];
   disabled?: (number | string)[];
   onChange: (value: number[], label: string[]) => void;
@@ -72,6 +74,7 @@ export const MultiWellPicker: FunctionComponent<IWellPickerProps> = ({
   rows,
   columns,
   format,
+  order,
   value,
   renderText: text = ({ label }) => label,
   disabled = [],
@@ -83,7 +86,7 @@ export const MultiWellPicker: FunctionComponent<IWellPickerProps> = ({
   ...wellPlateProps
 }) => {
   const wellPlate = useMemo(() => {
-    return new WellPlate({ rows, columns, positionFormat: format });
+    return new WellPlate({ rows, columns, positionFormat: format, iterationOrder: order });
   }, [rows, columns, format]);
   const valueSet = useMemo(() => {
     return new Set(value.map((label) => wellPlate.getPosition(label, 'index')));
