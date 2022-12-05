@@ -53,7 +53,7 @@ const ProjectDetail: React.FC = () => {
 
   const [plateRow, setPlateRow] = useState<number>(8);
   const [plateCol, setPlateCol] = useState<number>(12);
-  const [wellSize, setWellSize] = useState<number>(60);
+  const [wellSize, setWellSize] = useState<number>(55);
 
   const [paramsSizeError, setParamsSizeError] = useState<string>();
   const [plateCount, setPlateCount] = useState<number>(1); //需要的板子数目
@@ -513,10 +513,10 @@ const ProjectDetail: React.FC = () => {
                                            buildPlateType(9, 9, 60);
                                            break;
                                          case "2":
-                                           buildPlateType(8, 12, 60);
+                                           buildPlateType(8, 12, 55);
                                            break;
                                          case "3":
-                                           buildPlateType(16, 24, 35);
+                                           buildPlateType(16, 24, 32);
                                            break;
                                          default:
                                            buildPlateType(8, 12, 60);
@@ -554,7 +554,7 @@ const ProjectDetail: React.FC = () => {
               </Col>
             </Row>
           </Col>
-          <Col span={10}>
+          <Col span={12}>
             <MultiWellPicker value={selectedValues} rows={plateRow} columns={plateCol} wellSize={wellSize}
                              format={plateNumber}
                              order={plateDirection === "Vertical" ? IterationOrder.ByRow : IterationOrder.ByColumn}
@@ -582,7 +582,7 @@ const ProjectDetail: React.FC = () => {
                                );
                              }}/>
           </Col>
-          <Col span={10}>
+          <Col span={8}>
             <Space direction={"vertical"} style={{marginBottom: 10}}>
               <Space>
                 <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Custom)}>Add</Button>
