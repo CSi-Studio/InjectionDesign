@@ -10,6 +10,25 @@ export const RunType = {
   BLK: { text: 'BLK', value: 'BLK' },
 };
 
+export const DeviceGroup = [
+  {
+    label: <img height={20} src={'/img/Thermo.webp'}/>,
+    value: 'Thermo',
+  },
+  {
+    label: <img height={20} src={'/img/Sciex.jpg'}/>,
+    value: 'sciex',
+  },
+  {
+    label: <img height={30} src={'/img/Agilent.png'}/>,
+    value: 'agilent',
+  },
+  {
+    label: <img height={30} src={'/img/Bruker.svg'}/>,
+    value: 'bruker',
+  },
+]
+
 export const MsType = {
   PROFILE: { text: 'PROFILE', value: 'PROFILE' },
   CENTROIDED: { text: 'CENTROIDED', value: 'CENTROIDED' },
@@ -46,7 +65,8 @@ export const PlateNumber = {
   'NUMBER_NUMBER': '1-N'
 }
 
-export const QCColors = {
+export const SampleColors = {
+  'Normal': 'gold',
   'Custom': 'pink',
   'LTR': '#2db7f5',
   'Pooled': '#c8ffab',

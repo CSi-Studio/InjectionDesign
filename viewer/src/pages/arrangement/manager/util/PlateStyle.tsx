@@ -1,5 +1,5 @@
 import {CSSProperties} from "react";
-import {QCColors} from "@/components/Enums/Const";
+import {SampleColors} from "@/components/Enums/Const";
 
 export function buildStyles({index, wellPlate, disabled, booked, selected}: any,
                             customQcPosition: number[],
@@ -24,19 +24,19 @@ export function buildStyles({index, wellPlate, disabled, booked, selected}: any,
   }
 
   if (customQcPosition.indexOf(index + 1) > -1) {
-    styles.backgroundColor = QCColors.Custom;
+    styles.backgroundColor = SampleColors.Custom;
   }
   if (ltrQcPosition.indexOf(index + 1) > -1) {
-    styles.backgroundColor = QCColors.LTR;
+    styles.backgroundColor = SampleColors.LTR;
   }
   if (pooledQcPosition.indexOf(index + 1) > -1) {
-    styles.backgroundColor = QCColors.Pooled;
+    styles.backgroundColor = SampleColors.Pooled;
   }
   if (solventQcPosition.indexOf(index + 1) > -1) {
-    styles.backgroundColor = QCColors.Solvent;
+    styles.backgroundColor = SampleColors.Solvent;
   }
   if (blankQcPosition.indexOf(index + 1) > -1) {
-    styles.backgroundColor = QCColors.Blank;
+    styles.backgroundColor = SampleColors.Blank;
   }
   if (samplePosition?.indexOf(index + 1) > -1){
     styles.backgroundColor = 'gold';

@@ -1,18 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {Card, Switch, Table, Tag, Transfer} from 'antd';
+import {Card, Table, Tag, Transfer} from 'antd';
 import type {ColumnsType, TableRowSelection} from 'antd/es/table/interface';
 import type {TransferItem, TransferProps} from 'antd/es/transfer';
 import difference from 'lodash/difference';
 import ProForm from "@ant-design/pro-form";
-import {ProFormRadio} from '@ant-design/pro-components';
-import {ProFormSelect} from "@ant-design/pro-form/es";
-import RunTemplateService from "@/services/RunTemplateService";
-
-
-/**
- * service
- */
-const runTemplateService = new RunTemplateService();
+import {DeviceGroup, SampleColors} from "@/components/Enums/Const";
+import {Scatter} from "@ant-design/charts";
+import { ProFormRadio } from '@ant-design/pro-components';
 
 interface RecordType {
   key: string;
@@ -66,25 +60,65 @@ const TableTransfer = ({leftColumns, rightColumns, ...restProps}: TableTransferP
         selectedRowKeys: listSelectedKeys,
       };
 
-      return (
-        <Table
-          rowSelection={rowSelection}
-          columns={columns}
-          dataSource={filteredItems}
-          size="small"
-          style={{pointerEvents: listDisabled ? 'none' : undefined}}
-          onRow={({key, disabled: itemDisabled}) => ({
-            onClick: () => {
-              if (itemDisabled || listDisabled) return;
-              onItemSelect(key as string, !listSelectedKeys.includes(key as string));
-            },
-          })}
-        />
-      );
+      return <Table
+        rowSelection={rowSelection}
+        columns={columns}
+        dataSource={filteredItems}
+        size="small"
+        style={{pointerEvents: listDisabled ? 'none' : undefined}}
+        onRow={({key, disabled: itemDisabled}) => ({
+          onClick: () => {
+            if (itemDisabled || listDisabled) return;
+            onItemSelect(key as string, !listSelectedKeys.includes(key as string));
+          },
+        })}
+      />
     }}
   </Transfer>
 );
 
+const plateListColumn = [
+  {
+    key:"setNo",
+    dataIndex: "setNo",
+    title: "Set",
+    width: 80,
+    render: (text, dom) => dom[0],
+  },
+  {
+    key:"qcSamples",
+    dataIndex: "qcSamples",
+    title: "QC",
+    width: 80,
+    render: (text, dom) => <Tag>{dom[1].filter(item=>item.type !== "Normal").length}</Tag>,
+  },
+  {
+    key:"samples",
+    dataIndex: "samples",
+    title: "Samples",
+    width: 80,
+    render: (text, dom) => <Tag>{dom[1].filter(item=>item.type === "Normal").length}</Tag>,
+  },
+  {
+    key:"sequence",
+    dataIndex: "sequence",
+    title: "Sequence",
+    render: (text, dom) => <Scatter width={1400} height={30} data={dom[1]} xField={'index'} autoFit={true}
+                                    colorField={"type"} size={5} xAxis={false} yAxis={false}
+                                    yField={"set"} padding={[0,10,0,10]} legend={false} shape={'square'}
+                                    color={({ type }) => { return SampleColors[type]}}
+                                    tooltip={{
+                                      fields: ['sampleNo', 'type', 'index', 'dim1', 'dim2', 'dim3']
+                                    }}
+    />,
+  },
+  {
+    key:"link",
+    title: "Link",
+    width: 80,
+    render: (text, dom) => <a>Download</a>,
+  }
+]
 
 const dataFor6500Column: RecordType[] = [
   {
@@ -161,10 +195,12 @@ const dataFor6500Column: RecordType[] = [
 
 const leftTableColumns: ColumnsType<DataType> = [
   {
+    key: 'title',
     dataIndex: 'title',
     title: 'Title',
   },
   {
+    key: 'description',
     dataIndex: 'description',
     title: 'Description',
   },
@@ -172,15 +208,18 @@ const leftTableColumns: ColumnsType<DataType> = [
 
 const rightTableColumns: ColumnsType<Pick<DataType, 'title'>> = [
   {
+    key:"title",
     dataIndex: 'title',
     title: 'Title',
   },
   {
+    key:"alias",
     dataIndex: 'alias',
     title: 'Alias',
     render: alias => <Tag>{alias}</Tag>,
   },
   {
+    key: 'option',
     dataIndex: 'option',
     title: "Option",
     render: (text, sample) => [
@@ -192,145 +231,60 @@ const rightTableColumns: ColumnsType<Pick<DataType, 'title'>> = [
 
 const WorkSheet: React.FC = (props, context) => {
   const [targetKeys, setTargetKeys] = useState<string[]>([]);
-  const [showSearch, setShowSearch] = useState(true);
-  const [device, setDeviceType] = useState<string>();
   const [workSheetHeader, setWorkSheetHeader] = useState<RecordType[]>(dataFor6500Column);
-  const [batchNo, setBatchNo] = useState<any>();
-  const [injectTemplate, setInjectTemplate] = useState<any>();
-  const randomSample = props?.randomSample;
-
-  useEffect(() => {
-    setTargetKeys(targetKeys)
-    props.setTargetKey(targetKeys)
-  }, [targetKeys])
-
-  useEffect(() => {
-    props.setSelectBatch(batchNo);
-  }, [batchNo])
-
-  useEffect(()=>{
-    props.setInjectTemplate(injectTemplate)
-  }, [injectTemplate])
+  const setMap = props?.setMap;
 
   const onChange = (nextTargetKeys: string[]) => {
     setTargetKeys(nextTargetKeys);
   };
 
-  const triggerShowSearch = (checked: boolean) => {
-    setShowSearch(checked);
-  };
-
-  return (
-    <>
-      <ProForm layout="vertical" submitter={false}>
-        <Card title={"Device"}>
-          <ProForm.Group>
-            <ProFormSelect
-              width={200}
-              mode="multiple"
-              name="setNo"
-              label={"Set No:"}
-              onChange={(value: any) => {
-                setBatchNo(value)
-              }}
-              placeholder="Please select"
-              options={randomSample.plateCountArr?.map((item) => {
-                return {value: item, label: item}
-              })}
-            >
-            </ProFormSelect>
-
-            <ProFormSelect
-              label={"Inject Template:"}
-              width="xl"
-              name="runTemplate"
-              rules={[{required: true, message: 'please select injection template'}]}
-              onChange={(value)=>{
-                setInjectTemplate(value)
-              }}
-              request={async () => {
-                const res: any[] = [];
-                const runTemplateListData = await runTemplateService.list({});
-                runTemplateListData?.data.map((item: { name: any; id: any }) => {
-                  const temp: Record<any, any> = {};
-                  temp.label = item.name;
-                  temp.value = item.name;
-                  res.push(temp);
-                  return null;
-                });
-                return res;
-              }}
-              placeholder="please select injection template"
-            />
-
-          </ProForm.Group>
-
-
-          <ProForm.Group>
-            <ProFormRadio.Group
-              initialValue={"Thermo"}
-              name="radio-group"
-              label="Device Type:"
-              onChange={(value) => {
-                let device = value.target.value;
-                if (device === 'Thermo') {
-                  setWorkSheetHeader(dataFor6500Column)
-                }
-                if (device === 'sciex') {
-                  setWorkSheetHeader(dataFor6500Column)
-                }
-                setDeviceType(device);
-              }}
-              options={[
-                {
-                  label: <img height={25} src={'/img/Thermo.webp'}/>,
-                  value: 'Thermo',
-                },
-                {
-                  label: <img height={25} src={'/img/Sciex.jpg'}/>,
-                  value: 'sciex',
-                },
-                {
-                  label: <img height={40} src={'/img/Agilent.png'}/>,
-                  value: 'agilent',
-                },
-                {
-                  label: <img height={40} src={'/img/Bruker.svg'}/>,
-                  value: 'bruker',
-                },
-              ]}
-            />
-          </ProForm.Group>
-
-
-        </Card>
-
-        <Card title={"Config WorkSheet Header"} bordered={false} style={{marginTop: 10}}>
-          <ProForm.Item name={"workSheetHeader"}>
-            <TableTransfer
-              dataSource={workSheetHeader}
-              targetKeys={targetKeys}
-              showSearch={showSearch}
-              onChange={onChange}
-              filterOption={(inputValue, item) =>
-                item.title!.indexOf(inputValue) !== -1 || item.tag.indexOf(inputValue) !== -1
+  // @ts-ignore
+  return <>
+    <Card size={'small'} title={"Device Type"}>
+      <ProForm layout="horizontal" submitter={false}>
+        <ProForm.Group>
+          <ProFormRadio.Group
+            initialValue={"Thermo"}
+            name="radio-group"
+            //@ts-ignore
+            onChange={(value: any) => {
+              let device = value.target.value;
+              if (device === 'Thermo') {
+                setWorkSheetHeader(dataFor6500Column)
               }
-              leftColumns={leftTableColumns}
-              rightColumns={rightTableColumns}
-            />
-            <Switch
-              unCheckedChildren="showSearch"
-              checkedChildren="showSearch"
-              checked={showSearch}
-              onChange={triggerShowSearch}
-              style={{marginTop: 16}}
-            />
-          </ProForm.Item>
-        </Card>
+              if (device === 'sciex') {
+                setWorkSheetHeader(dataFor6500Column)
+              }
+            }}
+            options={DeviceGroup}
+          />
+        </ProForm.Group>
       </ProForm>
-    </>
-  )
-    ;
+    </Card>
+    <Card size={'small'} title={"Header Config"}>
+      <TableTransfer
+        dataSource={workSheetHeader}
+        targetKeys={targetKeys}
+        showSearch={false}
+        onChange={onChange}
+        filterOption={(inputValue, item) =>
+          item.title!.indexOf(inputValue) !== -1 || item.tag.indexOf(inputValue) !== -1
+        }
+        leftColumns={leftTableColumns}
+        rightColumns={rightTableColumns}
+      />
+    </Card>
+    <Card size={'small'} title={"Plate List"}>
+      <Table
+        pagination={false}
+        size={'small'}
+        rowKey={'setNo'}
+        columns={plateListColumn}
+        dataSource={Object.entries(setMap)}
+      />
+    </Card>
+  </>
+
 };
 
 export default WorkSheet;

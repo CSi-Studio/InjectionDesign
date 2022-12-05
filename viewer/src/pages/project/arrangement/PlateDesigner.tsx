@@ -11,7 +11,7 @@ import {IterationOrder, PositionFormat} from "well-plates";
 import type {ActionType} from "@ant-design/pro-table";
 import {blockRandom, completeRandom, randomBalance, stratifiedBalance} from "@/utils/CommonUtil";
 import {Column, Scatter} from "@ant-design/charts";
-import {BalanceMethodEnum, DimsEnum, QCColors, QCTypeEnum, RandomMethodEnum} from "@/components/Enums/Const";
+import {BalanceMethodEnum, DimsEnum, SampleColors, QCTypeEnum, RandomMethodEnum} from "@/components/Enums/Const";
 import type {Sample, SampleSequence} from "@/domains/Sample.d";
 import ProForm, {ProFormDigit, ProFormSelect} from "@ant-design/pro-form";
 import {groupBy} from "lodash";
@@ -66,11 +66,16 @@ const PlateDesign: React.FC = (props: any) => {
 
   const platePositionList = GenerateList();
 
-  function setPropsSample(samples: any[]) {
-    props.setRandomSampleRes({
-      sampleData: samples,
-      plateCountArr: plateCountArr
+  function setSetMap(samples: any[]) {
+    plateCountArr.forEach(plateNo => {
+      samples = samples.concat(BuildQcSamples(plateNo));
     })
+    const groups = groupBy(samples, "set");
+    Object.entries(groups).forEach(entry=>{
+      entry[1].sort((a, b) => a.index - b.index);
+    })
+
+    props.setSetMap(groups)
   }
 
   const columns: ProColumns<SampleSequence>[] = [
@@ -100,15 +105,15 @@ const PlateDesign: React.FC = (props: any) => {
           case 'Normal':
             return <Tag color={'gold'}>{text}</Tag>;
           case 'Blank':
-            return <Tag color={QCColors.Blank}>{text}</Tag>;
+            return <Tag color={SampleColors.Blank}>{text}</Tag>;
           case 'Solvent':
-            return <Tag color={QCColors.Solvent}>{text}</Tag>;
+            return <Tag color={SampleColors.Solvent}>{text}</Tag>;
           case 'Pooled':
-            return <Tag color={QCColors.Pooled}>{text}</Tag>;
+            return <Tag color={SampleColors.Pooled}>{text}</Tag>;
           case 'LTR':
-            return <Tag color={QCColors.LTR}>{text}</Tag>;
+            return <Tag color={SampleColors.LTR}>{text}</Tag>;
           case 'Custom':
-            return <Tag color={QCColors.Custom}>{text}</Tag>;
+            return <Tag color={SampleColors.Custom}>{text}</Tag>;
         }
         return;
       }
@@ -262,13 +267,12 @@ const PlateDesign: React.FC = (props: any) => {
     })
 
     setSetSamples(sampleStat);
-    setSortedSamples(JSON.parse(JSON.stringify(sampleData)).filter((data: Record<string, any>) => data.set === setNo));
-    setPropsSample(newSampleData);
-
+    setSortedSamples(sampleData.filter((data: Record<string, any>) => data.set === setNo));
+    setSetMap(newSampleData);
   }, [sampleData])
 
   useEffect(() => {
-    setSortedSamples(JSON.parse(JSON.stringify(sampleData)).filter((data: Record<string, any>) => data.set === setNo))
+    setSortedSamples(sampleData.filter((data: Record<string, any>) => data.set === setNo))
   }, [setNo])
 
   /**
@@ -539,7 +543,7 @@ const PlateDesign: React.FC = (props: any) => {
               persistenceKey: 'pro-table-singe-demos',
               persistenceType: 'localStorage',
             }}
-            rowKey="id"
+            rowKey="index"
             search={false}
             options={{
               setting: {

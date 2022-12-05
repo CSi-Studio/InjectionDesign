@@ -13,7 +13,7 @@ import ProTable from '@ant-design/pro-table';
 import {Alert, Button, Card, Col, message, Modal, Row, Space, Steps,} from 'antd';
 import type {Key} from 'react';
 import React, {useEffect, useRef, useState} from 'react';
-import {Direction, PlateNumber, PlateTypeEnum, QCColors, QCTypeEnum} from '@/components/Enums/Const';
+import {Direction, PlateNumber, PlateTypeEnum, SampleColors, QCTypeEnum} from '@/components/Enums/Const';
 
 import ExcelUpload from '@/pages/project/arrangement/ExcelUpload';
 import {getParam} from "@/utils/StringUtil";
@@ -75,7 +75,7 @@ const ProjectDetail: React.FC = () => {
   const [plateDirection, setPlateDirection] = useState<IterationOrder>(IterationOrder.ByRow);
 
   // randomization return
-  const [randomSampleRes, setRandomSampleRes] = useState<any>({});
+  const [setMap, setSetMap] = useState<any>({});
   const [targetKeys, setTargetKeys] = useState<any>([]);
   const [selectBatch, setSelectBatch] = useState<any>();
   const [injectTemplate, setInjectTemplate] = useState<any>();
@@ -588,36 +588,36 @@ const ProjectDetail: React.FC = () => {
           <Col span={8}>
             <Space direction={"vertical"} style={{marginBottom: 10}}>
               <Space>
-                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Custom)}>Add</Button>
+                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Custom)}>Set</Button>
                 <Button danger onClick={() => clearQcPosition(QCTypeEnum.Custom)}>Clear</Button>
                 <TabletFilled
-                  style={{fontSize: "24px", color: QCColors.Custom}}/><b>{customQcPosition.length}</b> Custom QC
+                  style={{fontSize: "24px", color: SampleColors.Custom}}/><b>{customQcPosition.length}</b> Custom QC
               </Space>
               <Space>
-                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.LTR)}>Add</Button>
+                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.LTR)}>Set</Button>
                 <Button danger onClick={() => clearQcPosition(QCTypeEnum.LTR)}>Clear</Button>
-                <TabletFilled style={{fontSize: "24px", color: QCColors.LTR}}/><b>{ltrQcPosition.length}</b> Long-Term
+                <TabletFilled style={{fontSize: "24px", color: SampleColors.LTR}}/><b>{ltrQcPosition.length}</b> Long-Term
                 Reference QC
               </Space>
               <Space>
-                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Pooled)}>Add</Button>
+                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Pooled)}>Set</Button>
                 <Button danger onClick={() => clearQcPosition(QCTypeEnum.Pooled)}>Clear</Button>
                 <TabletFilled
-                  style={{fontSize: "24px", color: QCColors.Pooled}}/><b>{pooledQcPosition.length}</b> Pooled QC
+                  style={{fontSize: "24px", color: SampleColors.Pooled}}/><b>{pooledQcPosition.length}</b> Pooled QC
               </Space>
               <Space>
-                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Solvent)}>Add</Button>
+                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Solvent)}>Set</Button>
                 <Button danger onClick={() => clearQcPosition(QCTypeEnum.Solvent)}>Clear</Button>
                 <TabletFilled
-                  style={{fontSize: "24px", color: QCColors.Solvent}}/><b>{solventQcPosition.length}</b> Solvent QC
+                  style={{fontSize: "24px", color: SampleColors.Solvent}}/><b>{solventQcPosition.length}</b> Solvent QC
               </Space>
               <Space>
-                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Blank)}>Add</Button>
+                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Blank)}>Set</Button>
                 <Button danger onClick={() => clearQcPosition(QCTypeEnum.Blank)}>Clear</Button>
-                <TabletFilled style={{fontSize: "24px", color: QCColors.Blank}}/><b>{blankQcPosition.length}</b> Blank
+                <TabletFilled style={{fontSize: "24px", color: SampleColors.Blank}}/><b>{blankQcPosition.length}</b> Blank
                 QC
               </Space>
-              <Button danger onClick={() => clearQcPosition()}>Clear All</Button>
+              <Button danger onClick={() => clearQcPosition()}>Clear All QC Position</Button>
             </Space>
           </Col>
         </Row>
@@ -634,24 +634,25 @@ const ProjectDetail: React.FC = () => {
                             solventQcPosition={solventQcPosition}
                             ltrQcPosition={ltrQcPosition}
                             direction={plateDirection}
-                            sampleData={sampleData} setRandomSampleRes={setRandomSampleRes}/>
+                            sampleData={sampleData} setSetMap={setSetMap}/>
     },
     {
       title: "WorkSheet",
       //@ts-ignore
-      content: <WorkSheet randomSample={randomSampleRes} setTargetKey={setTargetKeys} setSelectBatch={setSelectBatch}
+      content: <WorkSheet setMap={setMap} setTargetKey={setTargetKeys} setSelectBatch={setSelectBatch}
                           setInjectTemplate={setInjectTemplate}/>
     },
     {
       title: "Finish",
       //@ts-ignore
-      content: <Preview randomSample={randomSampleRes} targetKeys={targetKeys} selectBatch={selectBatch}
+      content: <Preview randomSample={setMap} targetKeys={targetKeys} selectBatch={selectBatch}
                         injectTemplate={injectTemplate}/>
     },
   ];
   return (
     <>
       <Card
+        size={'small'}
         actions={[
           <Space>
             <Button key="Prev" onClick={() => setCurrent(current - 1)} disabled={current === 0}>Prev</Button>
@@ -659,8 +660,7 @@ const ProjectDetail: React.FC = () => {
                                    disabled={paramsSizeError !== undefined}>Next</Button> :
               <Button type={"primary"}>Finish</Button>}
           </Space>
-        ]}
-      >
+        ]}>
         <Steps
           type="navigation"
           size="small"
