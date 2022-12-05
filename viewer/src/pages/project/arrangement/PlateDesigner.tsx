@@ -137,13 +137,11 @@ const PlateDesign: React.FC = (props: any) => {
       title: 'dim1',
       dataIndex: 'dim1',
       ellipsis: true,
-      width: 120,
     },
     {
       key: 'dim2',
       title: 'dim2',
       dataIndex: 'dim2',
-      width: 120,
       ellipsis: true,
     },
     {
@@ -151,7 +149,6 @@ const PlateDesign: React.FC = (props: any) => {
       title: 'dim3',
       dataIndex: 'dim3',
       ellipsis: true,
-      width: 120,
     },
   ];
 
@@ -328,16 +325,16 @@ const PlateDesign: React.FC = (props: any) => {
       const values = entry[1];
       let nextPosition = getNextEmptyPosition(1);
       let samplePosition: number[] = [];
-      let qcSamples = BuildQcSamples(currentSetNo);
+      // let qcSamples = BuildQcSamples(currentSetNo);
       values.forEach((value, index) => {
         value.index = nextPosition;
-        value.position = platePositionList[nextPosition];
+        value.position = platePositionList[nextPosition - 1];
         samplePosition.push(nextPosition);
         nextPosition++;
         nextPosition = getNextEmptyPosition(nextPosition);
       })
       samplePositionMap[currentSetNo] = samplePosition;
-      totalSamples = totalSamples.concat(qcSamples.concat(values));
+      totalSamples = totalSamples.concat(values);
     })
 
     setSamplePositionMap(samplePositionMap);
@@ -355,25 +352,30 @@ const PlateDesign: React.FC = (props: any) => {
     const qcSamples: any[] = [];
 
     blankQcPosition.forEach(position => {
-      qcSamples.push({index: position, position: platePositionList[position], type: QCTypeEnum.Blank, set: setNo});
+      qcSamples.push({index: position, position: platePositionList[position - 1], type: QCTypeEnum.Blank, set: setNo});
     })
 
     solventQcPosition.forEach(position => {
-      qcSamples.push({index: position, position: platePositionList[position], type: QCTypeEnum.Solvent, set: setNo});
+      qcSamples.push({
+        index: position,
+        position: platePositionList[position - 1],
+        type: QCTypeEnum.Solvent,
+        set: setNo
+      });
     })
 
     customQcPosition.forEach(position => {
-      qcSamples.push({index: position, position: platePositionList[position], type: QCTypeEnum.Custom, set: setNo});
+      qcSamples.push({index: position, position: platePositionList[position - 1], type: QCTypeEnum.Custom, set: setNo});
     })
 
     ltrQcPosition.forEach(position => {
-      qcSamples.push({index: position, position: platePositionList[position], type: QCTypeEnum.LTR, set: setNo});
+      qcSamples.push({index: position, position: platePositionList[position - 1], type: QCTypeEnum.LTR, set: setNo});
     })
 
     pooledQcPosition.forEach(position => {
-      qcSamples.push({index: position, position: platePositionList[position], type: QCTypeEnum.Pooled, set: setNo});
+      qcSamples.push({index: position, position: platePositionList[position - 1], type: QCTypeEnum.Pooled, set: setNo});
     })
-
+    qcSamples.sort((a, b) => a.index - b.index);
     return qcSamples;
   }
 
@@ -528,7 +530,7 @@ const PlateDesign: React.FC = (props: any) => {
             columns={columns}
             actionRef={tableRef}
             //@ts-ignore
-            dataSource={dataSource.filter(data => data.set === setNo)}
+            dataSource={BuildQcSamples(setNo).concat(dataSource.filter(data => data.set === setNo))}
             editable={{
               type: 'multiple',
             }}
