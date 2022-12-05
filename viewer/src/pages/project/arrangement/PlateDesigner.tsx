@@ -441,9 +441,8 @@ const PlateDesign: React.FC = (props: any) => {
   return (
     <>
       <Row gutter={[5, 5]}>
-        <Col span={8}>
-          <Card size={"small"}
-                extra={<Button onClick={onExportExcel} type={"primary"}><DownloadOutlined/>Export</Button>}>
+        <Col span={24}>
+          <Card size={"small"} title={"Balance and Randomization Algorithm"}>
             <ProForm layout="horizontal" submitter={false}>
               <ProForm.Group>
                 <ProFormDigit readonly={true} label={"Total Samples"}>{props.sampleData?.length}</ProFormDigit>
@@ -453,8 +452,6 @@ const PlateDesign: React.FC = (props: any) => {
                                options={plateCountArr?.map((item) => {
                                  return {value: item, label: item}
                                })}/>
-              </ProForm.Group>
-              <ProForm.Group>
                 <ProFormSelect width={150} name="interBatchBalanceMethod" label='Inter-Batch'
                                valueEnum={BalanceMethodEnum} initialValue={"2"}
                                fieldProps={{
@@ -468,11 +465,7 @@ const PlateDesign: React.FC = (props: any) => {
                                    setInterBatchBalanceDim(value)
                                  }, size: 'small'
                                }}/>
-                <Button type={'primary'} onClick={() => {
-                  IntraBatchRandom(InterBatchBalance());
-                }}>Balance</Button>
-              </ProForm.Group>
-              <ProForm.Group>
+                <Button type={'primary'} onClick={() => {IntraBatchRandom(InterBatchBalance())}}>Balance</Button>
                 <ProFormSelect width={150} name="intraBatchRandomMethod" label='Intra-Batch'
                                valueEnum={RandomMethodEnum} initialValue={"2"}
                                fieldProps={{onChange: (value) => setIntraBatchRandomMethod(value), size: 'small'}}/>
@@ -488,21 +481,21 @@ const PlateDesign: React.FC = (props: any) => {
             </ProForm>
           </Card>
         </Col>
-        <Col span={8}>
+        <Col span={12}>
           <Card title={"Distribution on Sets"} size={'small'}>
-            <Column height={200} autoFit={true} isStack={true} data={setSamples} xField={'set'}
+            <Column height={150} autoFit={true} isStack={true} data={setSamples} xField={'set'}
                     yField={'count'} seriesField={'dim'} {...config}/>
           </Card>
         </Col>
-        <Col span={8}>
+        <Col span={12}>
           <Card title={"Injection Order on Set No" + setNo} size={'small'}>
-            <Scatter height={200} autoFit={true} data={sortedSamples} xField={'index'}
+            <Scatter height={150} autoFit={true} data={sortedSamples} xField={'index'}
                      colorField={DimsEnum[intraBatchRandomDim]} size={5}
                      yField={DimsEnum[intraBatchRandomDim]} shapeField={DimsEnum[intraBatchRandomDim]} {...config}
                      legend={false}/>
           </Card>
         </Col>
-        <Col span={12}>
+        <Col span={8}>
           <StateFullWellPicker
             rows={plateRow}
             columns={plateCol}
@@ -526,32 +519,18 @@ const PlateDesign: React.FC = (props: any) => {
             }
           />
         </Col>
-        <Col span={12}>
+        <Col span={16}>
           <ProTable<SampleSequence>
             size={'small'}
             columns={columns}
             actionRef={tableRef}
             //@ts-ignore
             dataSource={BuildQcSamples(setNo).concat(dataSource.filter(data => data.set === setNo))}
-            editable={{
-              type: 'multiple',
-            }}
-            scroll={{
-              y: 800
-            }}
-            columnsState={{
-              persistenceKey: 'pro-table-singe-demos',
-              persistenceType: 'localStorage',
-            }}
             rowKey="index"
             search={false}
-            options={{
-              setting: {
-                listsHeight: 400,
-              },
+            pagination={{
+              pageSize: 15
             }}
-            pagination={false}
-            dateFormatter="string"
             headerTitle="Sample"
             toolBarRender={false}
           />
