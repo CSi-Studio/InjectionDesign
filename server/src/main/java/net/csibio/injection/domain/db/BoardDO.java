@@ -38,7 +38,7 @@ public class BoardDO implements Serializable {
 
     /**
      * 状态
-     * @see net.csibio.injection.client.constants.enums.BoardStatus
+     * @see net.csibio.injection.constants.enums.BoardStatus
      *
      */
     @Indexed

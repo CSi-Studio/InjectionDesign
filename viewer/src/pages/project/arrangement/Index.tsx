@@ -46,7 +46,7 @@ const ProjectDetail: React.FC = () => {
   const tableRef = useRef<ActionType>(); //Table组件的引用
   const updateFormRef = useRef<ProFormInstance>();
 
-  const [total, setTotal] = useState<any>(); //数据总行
+  const [total, setTotal] = useState<any>(1); //数据总行
   const [loading, setLoading] = useState<boolean>(); //数据总行数
   const [sampleRowKeys, setSampleRowKeys] = useState<Key[]>([]); //样本接收行Keys信息
   const [showExcelUpload, setShowExcelUpload] = useState<boolean>(false); //样本excel导入
@@ -72,7 +72,7 @@ const ProjectDetail: React.FC = () => {
   const [plateType, setPlateType] = useState<string>('2');
   const [maxSamplesOnSinglePlate, setMaxSamplesOnSinglePlate] = useState<number>(96);
   const [plateNumber, setPlateNumber] = useState<PositionFormat>(PositionFormat.LetterNumber);
-  const [plateDirection, setPlateDirection] = useState<string>("Vertical");
+  const [plateDirection, setPlateDirection] = useState<IterationOrder>(IterationOrder.ByRow);
 
   // randomization return
   const [randomSampleRes, setRandomSampleRes] = useState<any>({});
@@ -542,11 +542,13 @@ const ProjectDetail: React.FC = () => {
                                      }
                                    }}/>
                     <ProFormSelect rules={[{required: true, message: 'required'}]} width={150} name="direction"
-                                   label={"Direction"} valueEnum={Direction} initialValue={plateDirection}
+                                   label={"Direction"} valueEnum={Direction}
                                    fieldProps={{
+                                     value: plateDirection === IterationOrder.ByRow ? "Vertical" : "Horizontal",
                                      onSelect: (label: string) => {
-                                       setPlateDirection(label);
-                                       buildQCInfo([],[],[],[],[])
+                                       setPlateDirection(label === "Vertical" ? IterationOrder.ByRow : IterationOrder.ByColumn);
+                                       buildQCInfo([], [], [], [], []);
+                                       setSelectedValues([]);
                                      }
                                    }}/>
                   </ProForm.Group>
@@ -555,9 +557,9 @@ const ProjectDetail: React.FC = () => {
             </Row>
           </Col>
           <Col span={12}>
-            <MultiWellPicker value={selectedValues} rows={plateRow} columns={plateCol} wellSize={wellSize}
-                             format={plateNumber}
-                             order={plateDirection === "Vertical" ? IterationOrder.ByRow : IterationOrder.ByColumn}
+            <MultiWellPicker value={selectedValues} rows={plateRow}
+                             columns={plateCol} wellSize={wellSize}
+                             format={plateNumber} order={plateDirection}
                              style={({index, wellPlate, disabled, booked, selected}) => {
                                return buildStyles({index, wellPlate, disabled, booked, selected},
                                  customQcPosition,
@@ -581,6 +583,7 @@ const ProjectDetail: React.FC = () => {
                                  </div>
                                );
                              }}/>
+
           </Col>
           <Col span={8}>
             <Space direction={"vertical"} style={{marginBottom: 10}}>

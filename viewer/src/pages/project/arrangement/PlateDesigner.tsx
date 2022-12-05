@@ -7,20 +7,18 @@ import type {ProColumns} from '@ant-design/pro-components';
 import {ProTable} from '@ant-design/pro-components';
 // @ts-ignore
 import styles from "@/pages/run/Manager/AddTemplate/style.less";
-import {PositionFormat} from "well-plates";
+import {IterationOrder, PositionFormat} from "well-plates";
 import type {ActionType} from "@ant-design/pro-table";
 import {blockRandom, completeRandom, randomBalance, stratifiedBalance} from "@/utils/CommonUtil";
 import {Column, Scatter} from "@ant-design/charts";
 import {BalanceMethodEnum, DimsEnum, QCColors, QCTypeEnum, RandomMethodEnum} from "@/components/Enums/Const";
 import type {Sample, SampleSequence} from "@/domains/Sample.d";
-import ProForm, {ProFormDigit} from "@ant-design/pro-form";
-import {ProFormSelect} from "@ant-design/pro-form";
+import ProForm, {ProFormDigit, ProFormSelect} from "@ant-design/pro-form";
 import {groupBy} from "lodash";
 import * as ExcelJs from 'exceljs';
 import {generateHeaders, saveWorkbook} from "@/utils/ExcelUtils";
 import {DownloadOutlined} from "@ant-design/icons";
 import {buildStyles} from "@/pages/arrangement/manager/util/PlateStyle";
-import {IterationOrder} from "_well-plates@6.0.3@well-plates";
 
 type IStateFullWellPickerProps = Omit<IWellPickerProps, 'onChange'>;
 const PlateDesign: React.FC = (props: any) => {
@@ -40,7 +38,7 @@ const PlateDesign: React.FC = (props: any) => {
   const [sampleData, setSampleData] = useState<any[]>([])
   const [plateCountArr, setPlateCountArr] = useState<number[]>([])
   const [plateCount, setPlateCount] = useState<number>(1)
-  const [direction] = useState<string>(props.direction)
+  const [direction] = useState<IterationOrder>(props.direction)
 
   const getAllQcPosition = () => {
     return [...props.customQcPosition,
@@ -291,7 +289,7 @@ const PlateDesign: React.FC = (props: any) => {
     }
 
     const newArr = [];
-    if (direction === "Horizontal") {
+    if (direction === IterationOrder.ByColumn) {
       for (const a of rowArr) {
         for (const b of colArr) {
           newArr.push(a + ":" + b)
@@ -509,7 +507,7 @@ const PlateDesign: React.FC = (props: any) => {
             value={[0]}
             displayAsGrid={false}
             format={yaxisFormat}
-            order={direction === "Vertical" ? IterationOrder.ByRow : IterationOrder.ByColumn}
+            order={direction}
             rangeSelectionMode={RangeSelectionMode.zone}
             style={({index, wellPlate, disabled, booked, selected}) => {
               return buildStyles({index, wellPlate, disabled, booked, selected},

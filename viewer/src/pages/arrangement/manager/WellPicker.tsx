@@ -87,7 +87,7 @@ export const MultiWellPicker: FunctionComponent<IWellPickerProps> = ({
 }) => {
   const wellPlate = useMemo(() => {
     return new WellPlate({ rows, columns, positionFormat: format, iterationOrder: order });
-  }, [rows, columns, format]);
+  }, [rows, columns, format, order]);
   const valueSet = useMemo(() => {
     return new Set(value.map((label) => wellPlate.getPosition(label, 'index')));
   }, [value, wellPlate]);
