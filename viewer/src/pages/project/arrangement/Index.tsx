@@ -638,15 +638,8 @@ const ProjectDetail: React.FC = () => {
     {
       title: "WorkSheet",
       //@ts-ignore
-      content: <WorkSheet setMap={setMap} setTargetKey={setTargetKeys} setSelectBatch={setSelectBatch}
-                          setInjectTemplate={setInjectTemplate}/>
-    },
-    {
-      title: "Finish",
-      //@ts-ignore
-      content: <Preview randomSample={setMap} targetKeys={targetKeys} selectBatch={selectBatch}
-                        injectTemplate={injectTemplate}/>
-    },
+      content: <WorkSheet setMap={setMap}/>
+    }
   ];
   return (
     <>

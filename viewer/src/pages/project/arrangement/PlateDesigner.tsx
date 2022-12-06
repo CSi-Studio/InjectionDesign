@@ -21,10 +21,11 @@ import {
 } from "@/components/Enums/Const";
 import type {Sample, SampleSequence} from "@/domains/Sample.d";
 import {groupBy} from "lodash";
-// import * as ExcelJs from 'exceljs';
-// import {generateHeaders, saveWorkbook} from "@/utils/ExcelUtils";
+import * as ExcelJs from 'exceljs';
+import {generateHeaders, saveWorkbook} from "@/utils/ExcelUtils";
 import {buildStyles} from "@/pages/arrangement/manager/util/PlateStyle";
 import {TabletFilled} from "@ant-design/icons";
+import {SampleColumns} from "@/pages/project/arrangement/Column";
 
 type IStateFullWellPickerProps = Omit<IWellPickerProps, 'onChange'>;
 const PlateDesign: React.FC = (props: any) => {
@@ -72,94 +73,38 @@ const PlateDesign: React.FC = (props: any) => {
 
   const platePositionList = GenerateList();
 
-  function setSetMap(samples: any[]) {
-    plateCountArr.forEach(plateNo => {
-      samples = samples.concat(BuildQcSamples(plateNo));
+  function insertQcSamples(plateNo: number, samples: any[]) {
+    const qcSamples = BuildQcSamples(plateNo);
+    const qcMap = groupBy(qcSamples, 'type')
+    //如果有Blank样品,第一针调整为Blank
+    if (qcMap[QCTypeEnum.Blank] && qcMap[QCTypeEnum.Blank].length > 0){
+      samples.splice(0, 0, qcMap[QCTypeEnum.Blank][0]);
+      qcMap[QCTypeEnum.Blank] = qcMap[QCTypeEnum.Blank].slice(1, qcMap[QCTypeEnum.Blank].length);
+    }
+    if (qcMap[QCTypeEnum.LTR] && qcMap[QCTypeEnum.LTR].length > 0){
+      samples.splice(samples.length, 0, qcMap[QCTypeEnum.LTR][0]);
+      qcMap[QCTypeEnum.LTR] = qcMap[QCTypeEnum.LTR].slice(1, qcMap[QCTypeEnum.LTR].length);
+    }
+    Object.entries(qcMap).forEach((entry) => {
+      const step = Math.floor(samples.length / (entry[1].length + 1))
+      for (let i = 1; i <= entry[1].length; i++) {
+        samples.splice(step*i, 0, entry[1][i-1]);
+      }
     })
+    return samples;
+  }
+
+  function setSetMap(samples: any[]) {
     const groups = groupBy(samples, "set");
     Object.entries(groups).forEach(entry => {
       entry[1].sort((a, b) => a.index - b.index);
+      const tempSamples = insertQcSamples(Number(entry[0]), entry[1]);
+      tempSamples.map((item, index)=>item.index = index+1);
+      groups[entry[0]] = tempSamples;
     })
     setSampleGroups(groups);
     props.setSetMap(groups)
   }
-
-  const columns: ProColumns<SampleSequence>[] = [
-    {
-      key: 'index',
-      title: 'index',
-      dataIndex: 'index',
-      width: 60,
-      render: (text) => {
-        return <Tag color={"gray"} style={{borderRadius: "70%"}}>{text}</Tag>;
-      },
-    },
-    {
-      key: 'Set No',
-      title: 'Set No',
-      dataIndex: 'set',
-      ellipsis: true,
-      width: 80,
-    },
-    {
-      key: 'type',
-      title: 'Type',
-      dataIndex: 'type',
-      width: 100,
-      render: (text) => {
-        switch (text) {
-          case 'Normal':
-            return <Tag color={'gold'}>{text}</Tag>;
-          case 'Blank':
-            return <Tag color={SampleColors.Blank}>{text}</Tag>;
-          case 'Solvent':
-            return <Tag color={SampleColors.Solvent}>{text}</Tag>;
-          case 'Pooled':
-            return <Tag color={SampleColors.Pooled}>{text}</Tag>;
-          case 'LTR':
-            return <Tag color={SampleColors.LTR}>{text}</Tag>;
-          case 'Custom':
-            return <Tag color={SampleColors.Custom}>{text}</Tag>;
-        }
-        return;
-      }
-    },
-    {
-      key: 'well',
-      title: 'Position',
-      dataIndex: 'position',
-      ellipsis: true,
-      width: 100,
-      render: (text) => {
-        return <Tag color={"gold"}>{text}</Tag>;
-      },
-    },
-    {
-      disable: true,
-      title: 'Sample No',
-      dataIndex: 'sampleNo',
-      key: 'sampleNo',
-      search: false,
-    },
-    {
-      key: 'dim1',
-      title: 'dim1',
-      dataIndex: 'dim1',
-      ellipsis: true,
-    },
-    {
-      key: 'dim2',
-      title: 'dim2',
-      dataIndex: 'dim2',
-      ellipsis: true,
-    },
-    {
-      key: 'dim3',
-      title: 'dim3',
-      dataIndex: 'dim3',
-      ellipsis: true,
-    },
-  ];
 
   function Init() {
     switch (props.plateType) {
@@ -333,7 +278,6 @@ const PlateDesign: React.FC = (props: any) => {
       const values = entry[1];
       let nextPosition = getNextEmptyPosition(1);
       let samplePosition: number[] = [];
-      // let qcSamples = BuildQcSamples(currentSetNo);
       values.forEach((value, index) => {
         value.index = nextPosition;
         value.position = platePositionList[nextPosition - 1];
@@ -383,6 +327,7 @@ const PlateDesign: React.FC = (props: any) => {
     pooledQcPosition.forEach(position => {
       qcSamples.push({index: position, position: platePositionList[position - 1], type: QCTypeEnum.Pooled, set: setNo});
     })
+
     qcSamples.sort((a, b) => a.index - b.index);
     return qcSamples;
   }
@@ -396,18 +341,18 @@ const PlateDesign: React.FC = (props: any) => {
     }} {...otherProps} />;
   }
 
-  // function onExportExcel() {
-  //   const workbook = new ExcelJs.Workbook();
-  //   const worksheet = workbook.addWorksheet('sheet');
-  //   // 设置 sheet 的默认行高
-  //   worksheet.properties.defaultRowHeight = 20;
-  //   // 设置列
-  //   worksheet.columns = generateHeaders(columns);
-  //   // 添加行
-  //   worksheet.addRows(dataSource);
-  //   // 导出excel
-  //   saveWorkbook(workbook, 'Injection-Random-Simple.xlsx');
-  // }
+  function onExportExcel() {
+    const workbook = new ExcelJs.Workbook();
+    const worksheet = workbook.addWorksheet('sheet');
+    // 设置 sheet 的默认行高
+    worksheet.properties.defaultRowHeight = 20;
+    // 设置列
+    worksheet.columns = generateHeaders(SampleColumns);
+    // 添加行
+    worksheet.addRows(sampleGroups[setNo]);
+    // 导出excel
+    saveWorkbook(workbook, 'Injection-Random-Simple-SetNo' + setNo + '.xlsx');
+  }
 
   const config = {
     xAxis: {
@@ -477,7 +422,7 @@ const PlateDesign: React.FC = (props: any) => {
           <Card size={'small'} title={"Distribution on Sets"} extra={<Space>
             Inter-Batch Balancing:<Select style={{width: 150}} defaultValue={BalanceMethodOptions[1]} size={'small'}
                                           options={BalanceMethodOptions}
-                                          onSelect={(lv:any) => setInterBatchBalanceMethod(lv)}/>
+                                          onSelect={(lv: any) => setInterBatchBalanceMethod(lv)}/>
             Dim:<Select style={{width: 80}} defaultValue={"1"} size={'small'}
                         options={DimsOptions} onSelect={(lv) => setInterBatchBalanceDim(lv)}/>
             <Button type={'primary'} size={'small'}
@@ -490,7 +435,7 @@ const PlateDesign: React.FC = (props: any) => {
           <Card title={"Injection Order on Set No" + setNo} size={'small'} extra={<Space>
             Intra-Batch Randomization:<Select style={{width: 150}} defaultValue={RandomMethodOptions[1]} size={'small'}
                                               options={RandomMethodOptions}
-                                              onSelect={(lv:any) => setIntraBatchRandomMethod(lv)}/>
+                                              onSelect={(lv: any) => setIntraBatchRandomMethod(lv)}/>
             Dim:<Select style={{width: 80}} defaultValue={"1"} size={'small'}
                         options={DimsOptions} onSelect={(lv) => setIntraBatchRandomDim(lv)}/>
             <Button type={'primary'} size={'small'} onClick={() => IntraBatchRandom()}>Random</Button></Space>}>
@@ -533,11 +478,10 @@ const PlateDesign: React.FC = (props: any) => {
         </Col>
         <Col span={14}>
           <Card size={'small'} title={"Set No." + setNo}>
-            <ProTable<SampleSequence>
+            <ProTable
               size={'small'}
-              columns={columns}
+              columns={SampleColumns}
               actionRef={tableRef}
-              //@ts-ignore
               dataSource={sampleGroups[setNo]}
               rowKey="id"
               search={false}
@@ -547,7 +491,6 @@ const PlateDesign: React.FC = (props: any) => {
               toolBarRender={false}
             />
           </Card>
-
         </Col>
       </Row>
     </>
