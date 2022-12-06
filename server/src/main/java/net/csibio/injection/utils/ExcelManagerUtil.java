@@ -29,7 +29,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-
 @Slf4j
 public abstract class ExcelManagerUtil<D extends BaseDO, Q extends PageQuery, S extends BaseService<D, Q>, V> extends AnalysisEventListener<V> {
 

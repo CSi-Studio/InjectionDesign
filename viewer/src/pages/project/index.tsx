@@ -40,9 +40,6 @@ const TableList: React.FC = () => {
   useEffect(() => {
   }, []);
 
-  /**
-   * column
-   */
   const columns: ProColumns<Project>[] = [
     {
       key: 'ID',

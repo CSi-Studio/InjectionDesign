@@ -44,11 +44,6 @@ public class ProjectDO implements Serializable {
     String owner;
 
     /**
-     * 平台
-     */
-    Set<String> platforms;
-
-    /**
      * 用户id
      */
     String userId;

@@ -53,28 +53,6 @@
     ],
   },
   {
-    name: 'RunTemplate',
-    icon: 'ReadOutlined',
-    path: '/run',
-    routes: [
-      {
-        path: "/run",
-        redirect: '/run/list'
-      },
-      {
-        path: "/run/list",
-        component: './run/Manager',
-        hideInMenu: true,
-      },
-      {
-        //创建模板
-        path: "/run/manager",
-        component: './run/Manager/AddTemplate',
-        hideInMenu: true,
-      }
-    ]
-  },
-  {
     path: '/',
     redirect: '/help',
   },

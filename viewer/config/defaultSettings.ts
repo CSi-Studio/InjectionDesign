@@ -16,7 +16,7 @@ const Settings: LayoutSettings & {
   colorWeak: false,
   title: 'Injection Design',
   pwa: false,
-  logo: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
+  logo: '/injection.svg',
   iconfontUrl: '',
 };
 

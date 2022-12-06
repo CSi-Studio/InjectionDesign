@@ -26,7 +26,6 @@ import PlateDesign from "@/pages/project/arrangement/PlateDesigner";
 import {MultiWellPicker} from "@/pages/arrangement/manager/WellPicker";
 import {IterationOrder, PositionFormat} from "well-plates";
 import WorkSheet from "@/pages/project/arrangement/WorkSheet";
-import Preview from "@/pages/project/arrangement/PreView";
 import {buildStyles} from "@/pages/arrangement/manager/util/PlateStyle";
 
 const {Step} = Steps;
@@ -76,9 +75,6 @@ const ProjectDetail: React.FC = () => {
 
   // randomization return
   const [setMap, setSetMap] = useState<any>({});
-  const [targetKeys, setTargetKeys] = useState<any>([]);
-  const [selectBatch, setSelectBatch] = useState<any>();
-  const [injectTemplate, setInjectTemplate] = useState<any>();
   const [judge, setJudge] = useState<number>(1);
 
   /********************
@@ -648,9 +644,9 @@ const ProjectDetail: React.FC = () => {
         actions={[
           <Space>
             <Button key="Prev" onClick={() => setCurrent(current - 1)} disabled={current === 0}>Prev</Button>
-            {current < 4 ? <Button key="Next" type="primary" onClick={() => setCurrent(current + 1)}
+            {current < 3 ? <Button key="Next" type="primary" onClick={() => setCurrent(current + 1)}
                                    disabled={paramsSizeError !== undefined}>Next</Button> :
-              <Button type={"primary"}>Finish</Button>}
+              <Button type={"primary"}>Finish and Save</Button>}
           </Space>
         ]}>
         <Steps
@@ -710,7 +706,6 @@ const ProjectDetail: React.FC = () => {
           }
         }}
       />
-
     </>
   );
 };

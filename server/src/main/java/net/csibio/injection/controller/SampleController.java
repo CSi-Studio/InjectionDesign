@@ -7,7 +7,6 @@ import net.csibio.injection.constants.enums.UploadType;
 import net.csibio.injection.domain.Result;
 import net.csibio.injection.domain.db.ProjectDO;
 import net.csibio.injection.domain.db.SampleDO;
-import net.csibio.injection.domain.db.SamplePositionDO;
 import net.csibio.injection.domain.vo.sample.SampleExcelErrorVO;
 import net.csibio.injection.excel.SampleExcelManager;
 import net.csibio.injection.domain.query.SampleQuery;
@@ -16,7 +15,6 @@ import net.csibio.injection.domain.vo.sample.SampleUpdateVO;
 import net.csibio.injection.exceptions.ParamsCheckException;
 import net.csibio.injection.service.BaseService;
 import net.csibio.injection.service.IProjectService;
-import net.csibio.injection.service.ISamplePositionService;
 import net.csibio.injection.service.ISampleService;
 import net.csibio.injection.utils.CommonUtil;
 import org.apache.commons.compress.utils.Lists;
@@ -50,9 +48,6 @@ public class SampleController extends BaseController<SampleDO, SampleQuery> {
 
     @Autowired
     private IProjectService projectService;
-
-    @Resource
-    private ISamplePositionService samplePositionService;
 
     @Override
     BaseService<SampleDO, SampleQuery> getBaseService() {
@@ -189,19 +184,6 @@ public class SampleController extends BaseController<SampleDO, SampleQuery> {
         SampleDO sample = sampleService.getById(sampleId);
         check(sample, ResultCode.SAMPLE_NOT_EXISTED);
         return sampleService.remove(sampleId);
-    }
-
-    /**
-     * 根据samplId获取样本location
-     *
-     * @param sampleId
-     * @return
-     */
-    @RequestMapping(value = "/getLoc")
-    Result getLoc(@RequestParam(value = "id", required = true) String sampleId) {
-        SamplePositionDO samplePosition = samplePositionService.getById(sampleId);
-        check(samplePosition, ResultCode.SAMPLE_NOT_EXISTED);
-        return Result.OK();
     }
 
     /**

@@ -67,7 +67,12 @@ const WorkSheet: React.FC = (props, context) => {
   ]
 
   // @ts-ignore
-  return <Card size={'small'} title={"Plate List"}>
+  return <Card size={'small'} title={"Plate List"} extra={<Button type={'primary'} size={'small'} onClick={() => {
+    Object.keys(setMap).forEach(key=>{
+      onExportExcel(Number(key))
+    })
+  }
+  }>Export All</Button>}>
       <Table
         pagination={false}
         size={'small'}
