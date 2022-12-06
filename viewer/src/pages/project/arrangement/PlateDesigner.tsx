@@ -1,4 +1,4 @@
-import {Button, Card, Col, Row, Tag} from 'antd';
+import {Button, Card, Col, Row, Select, Space, Tag} from 'antd';
 import React, {useEffect, useRef, useState} from 'react';
 import type {IWellPickerProps} from "@/pages/arrangement/manager/WellPicker";
 import {MultiWellPicker, RangeSelectionMode} from "@/pages/arrangement/manager/WellPicker";
@@ -11,22 +11,27 @@ import {IterationOrder, PositionFormat} from "well-plates";
 import type {ActionType} from "@ant-design/pro-table";
 import {blockRandom, completeRandom, randomBalance, stratifiedBalance} from "@/utils/CommonUtil";
 import {Column, Scatter} from "@ant-design/charts";
-import {BalanceMethodEnum, DimsEnum, SampleColors, QCTypeEnum, RandomMethodEnum} from "@/components/Enums/Const";
+import {
+  BalanceMethodOptions,
+  DimsEnum,
+  DimsOptions,
+  QCTypeEnum,
+  RandomMethodOptions,
+  SampleColors
+} from "@/components/Enums/Const";
 import type {Sample, SampleSequence} from "@/domains/Sample.d";
-import ProForm, {ProFormDigit, ProFormSelect} from "@ant-design/pro-form";
 import {groupBy} from "lodash";
-import * as ExcelJs from 'exceljs';
-import {generateHeaders, saveWorkbook} from "@/utils/ExcelUtils";
-import {DownloadOutlined} from "@ant-design/icons";
+// import * as ExcelJs from 'exceljs';
+// import {generateHeaders, saveWorkbook} from "@/utils/ExcelUtils";
 import {buildStyles} from "@/pages/arrangement/manager/util/PlateStyle";
+import {TabletFilled} from "@ant-design/icons";
 
 type IStateFullWellPickerProps = Omit<IWellPickerProps, 'onChange'>;
 const PlateDesign: React.FC = (props: any) => {
 
   const [setNo, setSetNo] = useState(1);
-  const [dataSource, setDataSource] = useState([])
   const [sortedSamples, setSortedSamples] = useState<Record<string, any>[]>([])
-  const [setSamples, setSetSamples] = useState<any[]>([])
+  const [barData, setBarData] = useState<any[]>([])
   const [interBatchBalanceMethod, setInterBatchBalanceMethod] = useState<string>('2')
   const [interBatchBalanceDim, setInterBatchBalanceDim] = useState<string>('1')
   const [intraBatchRandomMethod, setIntraBatchRandomMethod] = useState<string>('2')
@@ -39,6 +44,7 @@ const PlateDesign: React.FC = (props: any) => {
   const [plateCountArr, setPlateCountArr] = useState<number[]>([])
   const [plateCount, setPlateCount] = useState<number>(1)
   const [direction] = useState<IterationOrder>(props.direction)
+  const [sampleGroups, setSampleGroups] = useState({})
 
   const getAllQcPosition = () => {
     return [...props.customQcPosition,
@@ -71,10 +77,10 @@ const PlateDesign: React.FC = (props: any) => {
       samples = samples.concat(BuildQcSamples(plateNo));
     })
     const groups = groupBy(samples, "set");
-    Object.entries(groups).forEach(entry=>{
+    Object.entries(groups).forEach(entry => {
       entry[1].sort((a, b) => a.index - b.index);
     })
-
+    setSampleGroups(groups);
     props.setSetMap(groups)
   }
 
@@ -241,6 +247,7 @@ const PlateDesign: React.FC = (props: any) => {
     Init();
   }, [])
 
+  //切换算法的时候触发, props.sampleData是原始样品数据
   useEffect(() => {
     if (sampleData === undefined || sampleData.length === 0) {
       IntraBatchRandom(InterBatchBalance(props.sampleData));
@@ -251,8 +258,6 @@ const PlateDesign: React.FC = (props: any) => {
 
   useEffect(() => {
     const newSampleData = sampleData?.sort((a: any, b: any) => a.index - b.index)
-    //@ts-ignore
-    setDataSource(newSampleData)
     const sS = groupBy(JSON.parse(JSON.stringify(sampleData)), 'set');
     const sampleStat: any[] = [];
     Object.entries(sS).forEach((entry) => {
@@ -266,11 +271,12 @@ const PlateDesign: React.FC = (props: any) => {
       })
     })
 
-    setSetSamples(sampleStat);
+    setBarData(sampleStat);
     setSortedSamples(sampleData.filter((data: Record<string, any>) => data.set === setNo));
     setSetMap(newSampleData);
   }, [sampleData])
 
+  //切换板子的时候触发
   useEffect(() => {
     setSortedSamples(sampleData.filter((data: Record<string, any>) => data.set === setNo))
   }, [setNo])
@@ -390,21 +396,18 @@ const PlateDesign: React.FC = (props: any) => {
     }} {...otherProps} />;
   }
 
-  /**
-   * export
-   */
-  function onExportExcel() {
-    const workbook = new ExcelJs.Workbook();
-    const worksheet = workbook.addWorksheet('sheet');
-    // 设置 sheet 的默认行高
-    worksheet.properties.defaultRowHeight = 20;
-    // 设置列
-    worksheet.columns = generateHeaders(columns);
-    // 添加行
-    worksheet.addRows(dataSource);
-    // 导出excel
-    saveWorkbook(workbook, 'Injection-Random-Simple.xlsx');
-  }
+  // function onExportExcel() {
+  //   const workbook = new ExcelJs.Workbook();
+  //   const worksheet = workbook.addWorksheet('sheet');
+  //   // 设置 sheet 的默认行高
+  //   worksheet.properties.defaultRowHeight = 20;
+  //   // 设置列
+  //   worksheet.columns = generateHeaders(columns);
+  //   // 添加行
+  //   worksheet.addRows(dataSource);
+  //   // 导出excel
+  //   saveWorkbook(workbook, 'Injection-Random-Simple.xlsx');
+  // }
 
   const config = {
     xAxis: {
@@ -433,107 +436,118 @@ const PlateDesign: React.FC = (props: any) => {
           fontWeight: 500
         }
       }
-    },
-    regressionLine: {
-      type: 'quad', // linear, exp, loess, log, poly, pow, quad
-    },
+    }
+
   }
+  // @ts-ignore
   return (
     <>
       <Row gutter={[5, 5]}>
-        <Col span={24}>
-          <Card size={"small"} title={"Balance and Randomization Algorithm"}>
-            <ProForm layout="horizontal" submitter={false}>
-              <ProForm.Group>
-                <ProFormDigit readonly={true} label={"Total Samples"}>{props.sampleData?.length}</ProFormDigit>
-                <ProFormDigit readonly={true} label={"Total Plates"}>{plateCount}</ProFormDigit>
-                <ProFormSelect initialValue={"1"} width={100} name="setNo" label='Set No'
-                               fieldProps={{onChange: (value) => setSetNo(Number(value)), size: 'small'}}
-                               options={plateCountArr?.map((item) => {
-                                 return {value: item, label: item}
-                               })}/>
-                <ProFormSelect width={150} name="interBatchBalanceMethod" label='Inter-Batch'
-                               valueEnum={BalanceMethodEnum} initialValue={"2"}
-                               fieldProps={{
-                                 onChange: (value) => setInterBatchBalanceMethod(value),
-                                 size: 'small'
-                               }}/>
-                <ProFormSelect width={80} name="interBatchBalanceDim" label='Dim'
-                               valueEnum={DimsEnum} initialValue={"1"}
-                               fieldProps={{
-                                 onChange: (value) => {
-                                   setInterBatchBalanceDim(value)
-                                 }, size: 'small'
-                               }}/>
-                <Button type={'primary'} onClick={() => {IntraBatchRandom(InterBatchBalance())}}>Balance</Button>
-                <ProFormSelect width={150} name="intraBatchRandomMethod" label='Intra-Batch'
-                               valueEnum={RandomMethodEnum} initialValue={"2"}
-                               fieldProps={{onChange: (value) => setIntraBatchRandomMethod(value), size: 'small'}}/>
-                <ProFormSelect width={80} name="intraBatchRandomDim" label='Dim'
-                               valueEnum={DimsEnum} initialValue={"1"}
-                               fieldProps={{
-                                 onChange: (value) => {
-                                   setIntraBatchRandomDim(value)
-                                 }, size: 'small'
-                               }}/>
-                <Button type={'primary'} onClick={() => IntraBatchRandom()}>Random</Button>
-              </ProForm.Group>
-            </ProForm>
+        <Col span={8}>
+          <Card size={"small"} title={"Base Information"}>
+            <Space>
+              Total Samples:<Tag color={'green'}>{props.sampleData?.length}</Tag>
+              Total Plates:<Tag color={'green'}>{plateCount}</Tag>
+              Direction:<Tag color={'green'}>{direction === IterationOrder.ByRow ? "Vertical" : "Horizontal"}</Tag>
+            </Space>
+          </Card>
+        </Col>
+        <Col span={16}>
+          <Card size={"small"} title={"QC Information"}>
+            <Space size={30}>
+              <Space>
+                <TabletFilled style={{color: SampleColors.Custom}}/><b>{customQcPosition.length}</b> Custom QC
+              </Space>
+              <Space>
+                <TabletFilled style={{color: SampleColors.LTR}}/><b>{ltrQcPosition.length}</b> Long-Term Reference QC
+              </Space>
+              <Space>
+                <TabletFilled style={{color: SampleColors.Pooled}}/><b>{pooledQcPosition.length}</b> Pooled QC
+              </Space>
+              <Space>
+                <TabletFilled style={{color: SampleColors.Blank}}/><b>{blankQcPosition.length}</b> Blank QC
+              </Space>
+              <Space>
+                <TabletFilled style={{color: SampleColors.Solvent}}/><b>{solventQcPosition.length}</b> Solvent QC
+              </Space>
+            </Space>
           </Card>
         </Col>
         <Col span={12}>
-          <Card title={"Distribution on Sets"} size={'small'}>
-            <Column height={150} autoFit={true} isStack={true} data={setSamples} xField={'set'}
+          <Card size={'small'} title={"Distribution on Sets"} extra={<Space>
+            Inter-Batch Balancing:<Select style={{width: 150}} defaultValue={BalanceMethodOptions[1]} size={'small'}
+                                          options={BalanceMethodOptions}
+                                          onSelect={(lv:any) => setInterBatchBalanceMethod(lv)}/>
+            Dim:<Select style={{width: 80}} defaultValue={"1"} size={'small'}
+                        options={DimsOptions} onSelect={(lv) => setInterBatchBalanceDim(lv)}/>
+            <Button type={'primary'} size={'small'}
+                    onClick={() => IntraBatchRandom(InterBatchBalance())}>Balance</Button></Space>}>
+            <Column height={150} autoFit={true} isStack={true} data={barData} xField={'set'}
                     yField={'count'} seriesField={'dim'} {...config}/>
           </Card>
         </Col>
         <Col span={12}>
-          <Card title={"Injection Order on Set No" + setNo} size={'small'}>
+          <Card title={"Injection Order on Set No" + setNo} size={'small'} extra={<Space>
+            Intra-Batch Randomization:<Select style={{width: 150}} defaultValue={RandomMethodOptions[1]} size={'small'}
+                                              options={RandomMethodOptions}
+                                              onSelect={(lv:any) => setIntraBatchRandomMethod(lv)}/>
+            Dim:<Select style={{width: 80}} defaultValue={"1"} size={'small'}
+                        options={DimsOptions} onSelect={(lv) => setIntraBatchRandomDim(lv)}/>
+            <Button type={'primary'} size={'small'} onClick={() => IntraBatchRandom()}>Random</Button></Space>}>
             <Scatter height={150} autoFit={true} data={sortedSamples} xField={'index'}
-                     colorField={DimsEnum[intraBatchRandomDim]} size={5}
+                     colorField={DimsEnum[intraBatchRandomDim]} size={5} shape={["circle", "square", "diamond"]}
                      yField={DimsEnum[intraBatchRandomDim]} shapeField={DimsEnum[intraBatchRandomDim]} {...config}
-                     legend={false}/>
+                     xAxis={false} legend={false}/>
           </Card>
         </Col>
-        <Col span={8}>
-          <StateFullWellPicker
-            rows={plateRow}
-            columns={plateCol}
-            wellSize={wellSize}
-            renderText={({index}) => <div style={{fontSize: 12}}>{index + 1}</div>}
-            value={[0]}
-            displayAsGrid={false}
-            format={yaxisFormat}
-            order={direction}
-            rangeSelectionMode={RangeSelectionMode.zone}
-            style={({index, wellPlate, disabled, booked, selected}) => {
-              return buildStyles({index, wellPlate, disabled, booked, selected},
-                customQcPosition,
-                ltrQcPosition,
-                pooledQcPosition,
-                solventQcPosition,
-                blankQcPosition,
-                samplePositionMap[setNo]
-              )
-            }
-            }
-          />
+        <Col span={10}>
+          <Card size={'small'} title={"Plate Design--Set No" + setNo}
+                extra={<Space>Set No.<Select size={'small'} defaultValue={1} style={{width: 80}}
+                                             onSelect={(lv) => setSetNo(Number(lv))}
+                                             options={plateCountArr?.map((item) => {
+                                               return {value: item, label: item}
+                                             })}/></Space>}>
+            <StateFullWellPicker
+              rows={plateRow}
+              columns={plateCol}
+              wellSize={wellSize}
+              renderText={({index}) => <div style={{fontSize: 12}}>{index + 1}</div>}
+              value={[0]}
+              displayAsGrid={false}
+              format={yaxisFormat}
+              order={direction}
+              rangeSelectionMode={RangeSelectionMode.zone}
+              style={({index, wellPlate, disabled, booked, selected}) => {
+                return buildStyles({index, wellPlate, disabled, booked, selected},
+                  customQcPosition,
+                  ltrQcPosition,
+                  pooledQcPosition,
+                  solventQcPosition,
+                  blankQcPosition,
+                  samplePositionMap[setNo]
+                )
+              }
+              }
+            />
+          </Card>
         </Col>
-        <Col span={16}>
-          <ProTable<SampleSequence>
-            size={'small'}
-            columns={columns}
-            actionRef={tableRef}
-            //@ts-ignore
-            dataSource={BuildQcSamples(setNo).concat(dataSource.filter(data => data.set === setNo))}
-            rowKey="index"
-            search={false}
-            pagination={{
-              pageSize: 15
-            }}
-            headerTitle="Sample"
-            toolBarRender={false}
-          />
+        <Col span={14}>
+          <Card size={'small'} title={"Set No." + setNo}>
+            <ProTable<SampleSequence>
+              size={'small'}
+              columns={columns}
+              actionRef={tableRef}
+              //@ts-ignore
+              dataSource={sampleGroups[setNo]}
+              rowKey="id"
+              search={false}
+              pagination={{
+                pageSize: 15
+              }}
+              toolBarRender={false}
+            />
+          </Card>
+
         </Col>
       </Row>
     </>

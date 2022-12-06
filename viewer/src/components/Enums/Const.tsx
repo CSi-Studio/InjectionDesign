@@ -44,16 +44,53 @@ export const BalanceMethodEnum = {
   '2': 'Stratified Balance'
 }
 
+export const BalanceMethodOptions = [
+  {
+    label:'Random Balance',
+    value:'1',
+  },
+  {
+    label:'Stratified Balance',
+    value:'2',
+  }
+]
+
 export const RandomMethodEnum = {
   '1': 'Simple Random',
   '2': 'Block Random'
 }
+
+export const RandomMethodOptions = [
+  {
+    label:'Simple Random',
+    value:'1',
+  },
+  {
+    label:'Block Random',
+    value:'2',
+  }
+]
 
 export const DimsEnum = {
   '1': 'dim1',
   '2': 'dim2',
   '3': 'dim3',
 }
+
+export const DimsOptions = [
+  {
+    label:'dim1',
+    value:"1"
+  },
+  {
+    label:'dim2',
+    value:"2"
+  },
+  {
+    label:'dim3',
+    value:"3"
+  }
+]
 
 export const Direction = {
   'Horizontal': 'Horizontal',

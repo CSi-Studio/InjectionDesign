@@ -614,8 +614,7 @@ const ProjectDetail: React.FC = () => {
               <Space>
                 <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Blank)}>Set</Button>
                 <Button danger onClick={() => clearQcPosition(QCTypeEnum.Blank)}>Clear</Button>
-                <TabletFilled style={{fontSize: "24px", color: SampleColors.Blank}}/><b>{blankQcPosition.length}</b> Blank
-                QC
+                <TabletFilled style={{fontSize: "24px", color: SampleColors.Blank}}/><b>{blankQcPosition.length}</b> Blank QC
               </Space>
               <Button danger onClick={() => clearQcPosition()}>Clear All QC Position</Button>
             </Space>

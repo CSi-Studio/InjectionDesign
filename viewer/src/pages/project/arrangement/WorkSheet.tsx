@@ -83,27 +83,27 @@ const plateListColumn = [
     dataIndex: "setNo",
     title: "Set",
     width: 80,
-    render: (text, dom) => dom[0],
+    render: (text: any, dom: any) => dom[0],
   },
   {
     key:"qcSamples",
     dataIndex: "qcSamples",
     title: "QC",
     width: 80,
-    render: (text, dom) => <Tag>{dom[1].filter(item=>item.type !== "Normal").length}</Tag>,
+    render: (text: any, dom: any) => <Tag>{dom[1].filter((item: any)=>item.type !== "Normal").length}</Tag>,
   },
   {
     key:"samples",
     dataIndex: "samples",
     title: "Samples",
     width: 80,
-    render: (text, dom) => <Tag>{dom[1].filter(item=>item.type === "Normal").length}</Tag>,
+    render: (text: any, dom: any) => <Tag>{dom[1].filter((item: any)=>item.type === "Normal").length}</Tag>,
   },
   {
     key:"sequence",
     dataIndex: "sequence",
     title: "Sequence",
-    render: (text, dom) => <Scatter width={1400} height={30} data={dom[1]} xField={'index'} autoFit={true}
+    render: (text: any, dom: any) => <Scatter width={1400} height={30} data={dom[1]} xField={'index'} autoFit={true}
                                     colorField={"type"} size={5} xAxis={false} yAxis={false}
                                     yField={"set"} padding={[0,10,0,10]} legend={false} shape={'square'}
                                     color={({ type }) => { return SampleColors[type]}}
@@ -116,7 +116,7 @@ const plateListColumn = [
     key:"link",
     title: "Link",
     width: 80,
-    render: (text, dom) => <a>Download</a>,
+    render: (text: any, dom: any) => <a>Download</a>,
   }
 ]
 
