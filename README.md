@@ -1,6 +1,9 @@
 # InjectionDesign
 LC/GC-MS-based Multi-Omics Injection-Plate Design Web Service
 
+# Demo User Account
+username: admin
+password: admin123
 
 # Step1 Download Template and Upload Samples
 ![image](https://user-images.githubusercontent.com/730931/205900849-f11d635b-39a9-49c9-bd4d-2681230f4049.png)
