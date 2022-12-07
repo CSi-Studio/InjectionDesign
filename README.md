@@ -2,7 +2,7 @@
 LC/GC-MS-based Multi-Omics Injection-Plate Design Web Service
 
 # Demo User Account
-http://injection.design  
+Free Web Service: http://injection.design  
 username: admin  
 password: admin123  
 
