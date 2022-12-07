@@ -7,7 +7,7 @@ export default {
   'pages.login.success': 'Login successful! Welcome to Injection Design',
   'pages.login.username.placeholder': 'Username: admin',
   'pages.login.username.required': 'Please input your username!',
-  'pages.login.password.placeholder': 'Password: admin',
+  'pages.login.password.placeholder': 'Password: admin123',
   'pages.login.password.required': 'Please input your password!',
   'pages.login.phoneLogin.tab': 'Phone Login',
   'pages.login.phoneLogin.errorMessage': 'Verification Code Error',

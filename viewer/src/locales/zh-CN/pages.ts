@@ -1,5 +1,5 @@
 export default {
-  'pages.layouts.system.title': 'Injection',
+  'pages.layouts.system.title': 'Injection Design',
   'pages.layouts.userLayout.title': '欢迎使用实验室进样系统',
   'pages.login.accountLogin.tab': '账户密码登录',
   'pages.login.accountLogin.errorMessage': '错误的用户名和密码(admin/admin123)',
