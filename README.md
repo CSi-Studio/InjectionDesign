@@ -32,6 +32,6 @@ All the final sequence will display with a visualized way and users can download
 
 ## Demo
 
-[`InjectionDesign online`](http://112.124.50.186/)
+[`InjectionDesign online`](http://www.injection.design/)
 
 ---
