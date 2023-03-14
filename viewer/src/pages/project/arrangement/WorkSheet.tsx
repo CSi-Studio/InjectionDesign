@@ -24,7 +24,7 @@ const WorkSheet: React.FC = (props, context) => {
     // 设置 sheet 的默认行高
     worksheet.properties.defaultRowHeight = 20;
     // 设置列
-    worksheet.columns = generateHeaders(SampleColumns);
+    worksheet.columns = generateHeaders(tableHeader || SampleColumns);
     // 添加行
     worksheet.addRows(setMap[setNo]);
     // 导出excel
@@ -111,7 +111,7 @@ const WorkSheet: React.FC = (props, context) => {
       />
     </Card>
 
-    <Card title={"Preview"} extra={<Button type={"primary"}>Export</Button>}>
+    <Card title={"Preview"}>
       <ProTable<any>
         search={false}
         toolBarRender={false}
