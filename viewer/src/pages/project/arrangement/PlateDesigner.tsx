@@ -3,7 +3,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import type {IWellPickerProps} from "@/pages/arrangement/manager/WellPicker";
 import {MultiWellPicker, RangeSelectionMode} from "@/pages/arrangement/manager/WellPicker";
 
-import type {ProColumns} from '@ant-design/pro-components';
 import {ProTable} from '@ant-design/pro-components';
 // @ts-ignore
 import styles from "@/pages/run/Manager/AddTemplate/style.less";
@@ -19,7 +18,7 @@ import {
   RandomMethodOptions,
   SampleColors
 } from "@/components/Enums/Const";
-import type {Sample, SampleSequence} from "@/domains/Sample.d";
+import type {Sample} from "@/domains/Sample.d";
 import {groupBy} from "lodash";
 import * as ExcelJs from 'exceljs';
 import {generateHeaders, saveWorkbook} from "@/utils/ExcelUtils";
@@ -452,6 +451,7 @@ const PlateDesign: React.FC = (props: any) => {
                                              options={plateCountArr?.map((item) => {
                                                return {value: item, label: item}
                                              })}/></Space>}>
+            <center>
             <StateFullWellPicker
               rows={plateRow}
               columns={plateCol}
@@ -474,6 +474,7 @@ const PlateDesign: React.FC = (props: any) => {
               }
               }
             />
+            </center>
           </Card>
         </Col>
         <Col span={14}>

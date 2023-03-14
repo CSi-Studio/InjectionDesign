@@ -470,150 +470,161 @@ const ProjectDetail: React.FC = () => {
       title: 'Design Params',
       content: <Card>
         <Row gutter={[5, 5]}>
-          <Col span={4}>
-            <Row>
-              <Col span={24}>
-                {paramsSizeError !== undefined ?
-                  <Alert type={"error"} banner={true} message={paramsSizeError}/> : <></>}
-                <Alert type={'success'} banner={true} message={plateCount + " Plates Needed"}/>
-              </Col>
-              <Col span={24}>
-                <ProForm
-                  style={{marginTop: 20}}
-                  onValuesChange={(changedValues) => {
-                    setParamsSizeError(undefined);
-                    if (changedValues.plateType) {
-                      setPlateType(changedValues.plateType)
-                    }
-                    if (changedValues.maxSamplesOnSinglePlate) {
-                      setMaxSamplesOnSinglePlate(changedValues.maxSamplesOnSinglePlate)
-                    }
-                    setPlateCount(Math.ceil(total / maxSamplesOnSinglePlate))
-                    setJudge(judge + 1)
-                  }}
-                  name="basic"
-                  layout="vertical"
-                  submitter={false}
-                  initialValues={{
-                    plateNumber,
-                    maxSamplesOnSinglePlate,
-                    plateType,
-                  }}>
-                  <ProForm.Group>
-                    <ProFormSelect rules={[{required: true, message: 'required'}]} width={150} name="plateType"
-                                   label={"Plate"} valueEnum={PlateTypeEnum}
-                                   fieldProps={{
-                                     onSelect: function (label: string) {
-                                       switch (label) {
-                                         case "1":
-                                           buildPlateType(9, 9, 60);
-                                           break;
-                                         case "2":
-                                           buildPlateType(8, 12, 55);
-                                           break;
-                                         case "3":
-                                           buildPlateType(16, 24, 32);
-                                           break;
-                                         default:
-                                           buildPlateType(8, 12, 60);
+          <Col span={6}>
+            <Card title={"Define Generate Params"}>
+              <Row>
+                <Col span={24}>
+                  {paramsSizeError !== undefined ?
+                    <Alert type={"error"} banner={true} message={paramsSizeError}/> : <></>}
+                  <Alert type={'success'} banner={true} message={plateCount + " Plates Needed"}/>
+                </Col>
+                <Col span={24}>
+                  <ProForm
+                    style={{marginTop: 20}}
+                    onValuesChange={(changedValues) => {
+                      setParamsSizeError(undefined);
+                      if (changedValues.plateType) {
+                        setPlateType(changedValues.plateType)
+                      }
+                      if (changedValues.maxSamplesOnSinglePlate) {
+                        setMaxSamplesOnSinglePlate(changedValues.maxSamplesOnSinglePlate)
+                      }
+                      setPlateCount(Math.ceil(total / maxSamplesOnSinglePlate))
+                      setJudge(judge + 1)
+                    }}
+                    name="basic"
+                    layout="vertical"
+                    submitter={false}
+                    initialValues={{
+                      plateNumber,
+                      maxSamplesOnSinglePlate,
+                      plateType,
+                    }}>
+                    <ProForm.Group>
+                      <ProFormSelect rules={[{required: true, message: 'required'}]} width={150} name="plateType"
+                                     label={"Plate"} valueEnum={PlateTypeEnum}
+                                     fieldProps={{
+                                       onSelect: function (label: string) {
+                                         switch (label) {
+                                           case "1":
+                                             buildPlateType(9, 9, 60);
+                                             break;
+                                           case "2":
+                                             buildPlateType(8, 12, 55);
+                                             break;
+                                           case "3":
+                                             buildPlateType(16, 24, 32);
+                                             break;
+                                           default:
+                                             buildPlateType(8, 12, 60);
+                                         }
+                                         buildQCInfo([], [], [], [], []);
                                        }
-                                       buildQCInfo([], [], [], [], []);
-                                     }
-                                   }}
-                    />
-                    <ProFormDigit rules={[{required: true, message: 'required'}]} width={150}
-                                  name="maxSamplesOnSinglePlate" min={1} label={"Max Samples on Single Plate"}
-                                  fieldProps={{
-                                    value: maxSamplesOnSinglePlate,
-                                    onChange: (value: any) => {
-                                      setMaxSamplesOnSinglePlate(value);
-                                    }
-                                  }}
-                    />
-                    <ProFormSelect rules={[{required: true, message: 'required'}]} width={150} name="plateNumber"
-                                   label={"Plate Number"} valueEnum={PlateNumber}
-                                   fieldProps={{
-                                     onSelect: (label: PositionFormat) => {
-                                       setPlateNumber(label);
-                                     }
-                                   }}/>
-                    <ProFormSelect rules={[{required: true, message: 'required'}]} width={150} name="direction"
-                                   label={"Direction"} valueEnum={Direction}
-                                   fieldProps={{
-                                     value: plateDirection === IterationOrder.ByRow ? "Vertical" : "Horizontal",
-                                     onSelect: (label: string) => {
-                                       setPlateDirection(label === "Vertical" ? IterationOrder.ByRow : IterationOrder.ByColumn);
-                                       buildQCInfo([], [], [], [], []);
-                                       setSelectedValues([]);
-                                     }
-                                   }}/>
-                  </ProForm.Group>
-                </ProForm>
-              </Col>
-            </Row>
+                                     }}
+                      />
+                      <ProFormDigit rules={[{required: true, message: 'required'}]} width={150}
+                                    name="maxSamplesOnSinglePlate" min={1} label={"Max Samples on Single Plate"}
+                                    fieldProps={{
+                                      value: maxSamplesOnSinglePlate,
+                                      onChange: (value: any) => {
+                                        setMaxSamplesOnSinglePlate(value);
+                                      }
+                                    }}
+                      />
+                      <ProFormSelect rules={[{required: true, message: 'required'}]} width={150} name="plateNumber"
+                                     label={"Plate Number"} valueEnum={PlateNumber}
+                                     fieldProps={{
+                                       onSelect: (label: PositionFormat) => {
+                                         setPlateNumber(label);
+                                       }
+                                     }}/>
+                      <ProFormSelect rules={[{required: true, message: 'required'}]} width={150} name="direction"
+                                     label={"Direction"} valueEnum={Direction}
+                                     fieldProps={{
+                                       value: plateDirection === IterationOrder.ByRow ? "Vertical" : "Horizontal",
+                                       onSelect: (label: string) => {
+                                         setPlateDirection(label === "Vertical" ? IterationOrder.ByRow : IterationOrder.ByColumn);
+                                         buildQCInfo([], [], [], [], []);
+                                         setSelectedValues([]);
+                                       }
+                                     }}/>
+                    </ProForm.Group>
+                  </ProForm>
+                </Col>
+              </Row>
+            </Card>
           </Col>
           <Col span={12}>
-            <MultiWellPicker value={selectedValues} rows={plateRow}
-                             columns={plateCol} wellSize={wellSize}
-                             format={plateNumber} order={plateDirection}
-                             style={({index, wellPlate, disabled, booked, selected}) => {
-                               return buildStyles({index, wellPlate, disabled, booked, selected},
-                                 customQcPosition,
-                                 ltrQcPosition,
-                                 pooledQcPosition,
-                                 solventQcPosition,
-                                 blankQcPosition,
-                                 []);
-                             }}
-                             onChange={(values, labels) => {
-                               if (values.length === 1 && selectedValues.length === 1 && values[0] === selectedValues[0]) {
-                                 setSelectedValues([]);
-                               } else {
-                                 setSelectedValues(values);
-                               }
-                             }}
-                             renderText={({label}) => {
-                               return (
-                                 <div style={{fontSize: 12}}>
-                                   <div>{label}</div>
-                                 </div>
-                               );
-                             }}/>
+            <Card title={"Define QC Positions"}>
+              <center>
+                <MultiWellPicker value={selectedValues} rows={plateRow}
+                                 columns={plateCol} wellSize={wellSize}
+                                 format={plateNumber} order={plateDirection}
+                                 style={({index, wellPlate, disabled, booked, selected}) => {
+                                   return buildStyles({index, wellPlate, disabled, booked, selected},
+                                     customQcPosition,
+                                     ltrQcPosition,
+                                     pooledQcPosition,
+                                     solventQcPosition,
+                                     blankQcPosition,
+                                     []);
+                                 }}
+                                 onChange={(values, labels) => {
+                                   if (values.length === 1 && selectedValues.length === 1 && values[0] === selectedValues[0]) {
+                                     setSelectedValues([]);
+                                   } else {
+                                     setSelectedValues(values);
+                                   }
+                                 }}
+                                 renderText={({label}) => {
+                                   return (
+                                     <div style={{fontSize: 12}}>
+                                       <div>{label}</div>
+                                     </div>
+                                   );
+                                 }}/>
+              </center>
+            </Card>
 
           </Col>
-          <Col span={8}>
-            <Space direction={"vertical"} style={{marginBottom: 10}}>
-              <Space>
-                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Custom)}>Set</Button>
-                <Button danger onClick={() => clearQcPosition(QCTypeEnum.Custom)}>Clear</Button>
-                <TabletFilled
-                  style={{fontSize: "24px", color: SampleColors.Custom}}/><b>{customQcPosition.length}</b> Custom QC
+          <Col span={6}>
+            <Card>
+              <Space direction={"vertical"} style={{marginBottom: 10, marginTop: 100}}>
+                <Space>
+                  <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Custom)}>Set</Button>
+                  <Button danger onClick={() => clearQcPosition(QCTypeEnum.Custom)}>Clear</Button>
+                  <TabletFilled
+                    style={{fontSize: "24px", color: SampleColors.Custom}}/><b>{customQcPosition.length}</b> Custom QC
+                </Space>
+                <Space>
+                  <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.LTR)}>Set</Button>
+                  <Button danger onClick={() => clearQcPosition(QCTypeEnum.LTR)}>Clear</Button>
+                  <TabletFilled
+                    style={{fontSize: "24px", color: SampleColors.LTR}}/><b>{ltrQcPosition.length}</b> Long-Term
+                  Reference QC
+                </Space>
+                <Space>
+                  <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Pooled)}>Set</Button>
+                  <Button danger onClick={() => clearQcPosition(QCTypeEnum.Pooled)}>Clear</Button>
+                  <TabletFilled
+                    style={{fontSize: "24px", color: SampleColors.Pooled}}/><b>{pooledQcPosition.length}</b> Pooled QC
+                </Space>
+                <Space>
+                  <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Solvent)}>Set</Button>
+                  <Button danger onClick={() => clearQcPosition(QCTypeEnum.Solvent)}>Clear</Button>
+                  <TabletFilled
+                    style={{fontSize: "24px", color: SampleColors.Solvent}}/><b>{solventQcPosition.length}</b> Solvent
+                  QC
+                </Space>
+                <Space>
+                  <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Blank)}>Set</Button>
+                  <Button danger onClick={() => clearQcPosition(QCTypeEnum.Blank)}>Clear</Button>
+                  <TabletFilled
+                    style={{fontSize: "24px", color: SampleColors.Blank}}/><b>{blankQcPosition.length}</b> Blank QC
+                </Space>
+                <Button danger onClick={() => clearQcPosition()}>Clear All QC Position</Button>
               </Space>
-              <Space>
-                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.LTR)}>Set</Button>
-                <Button danger onClick={() => clearQcPosition(QCTypeEnum.LTR)}>Clear</Button>
-                <TabletFilled style={{fontSize: "24px", color: SampleColors.LTR}}/><b>{ltrQcPosition.length}</b> Long-Term
-                Reference QC
-              </Space>
-              <Space>
-                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Pooled)}>Set</Button>
-                <Button danger onClick={() => clearQcPosition(QCTypeEnum.Pooled)}>Clear</Button>
-                <TabletFilled
-                  style={{fontSize: "24px", color: SampleColors.Pooled}}/><b>{pooledQcPosition.length}</b> Pooled QC
-              </Space>
-              <Space>
-                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Solvent)}>Set</Button>
-                <Button danger onClick={() => clearQcPosition(QCTypeEnum.Solvent)}>Clear</Button>
-                <TabletFilled
-                  style={{fontSize: "24px", color: SampleColors.Solvent}}/><b>{solventQcPosition.length}</b> Solvent QC
-              </Space>
-              <Space>
-                <Button type={'primary'} onClick={() => onQcPositionSelected(QCTypeEnum.Blank)}>Set</Button>
-                <Button danger onClick={() => clearQcPosition(QCTypeEnum.Blank)}>Clear</Button>
-                <TabletFilled style={{fontSize: "24px", color: SampleColors.Blank}}/><b>{blankQcPosition.length}</b> Blank QC
-              </Space>
-              <Button danger onClick={() => clearQcPosition()}>Clear All QC Position</Button>
-            </Space>
+            </Card>
           </Col>
         </Row>
       </Card>,

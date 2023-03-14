@@ -164,6 +164,7 @@ export type DesignParams = {
 }
 
 export type SampleSequence = {
+  desc: string;
   well: string;
   Type: string;
   SampleId: string;
