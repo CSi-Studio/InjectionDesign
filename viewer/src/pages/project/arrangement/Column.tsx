@@ -1,5 +1,5 @@
 import type {ProColumns} from '@ant-design/pro-table';
-import {Popconfirm} from 'antd';
+import {Popconfirm, Tag} from 'antd';
 import type {Sample} from '@/domains/Sample.d';
 import {DeleteOutlined} from "@ant-design/icons";
 // @ts-ignore
@@ -8,7 +8,6 @@ import { FormattedMessage } from 'umi';
 import React from "react";
 import {buildUpdateSampleModal} from "@/pages/sample/Modals";
 import {SampleSequence} from "@/domains/Sample.d";
-import {Tag} from "_antd@4.24.4@antd";
 import {SampleColors} from "@/components/Enums/Const";
 
 export function buildColumn(updateForm: any, doUpdate: any, doDelete: any) {

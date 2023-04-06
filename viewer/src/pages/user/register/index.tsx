@@ -1,11 +1,12 @@
 import type {FC} from 'react';
-import {useState, useEffect} from 'react';
-import {Form, Button, Input, Popover, Progress, message} from 'antd';
+import React, {useState, useEffect} from 'react';
+import {Form, Button, Input, Popover, Progress, message, Card} from 'antd';
 import type {Store} from 'antd/es/form/interface';
 import {Link, useRequest, history} from 'umi';
 import {UserRegister} from './service';
 
 import styles from './style.less';
+import {LockOutlined, UserOutlined} from "@ant-design/icons";
 
 const FormItem = Form.Item;
 
@@ -127,7 +128,11 @@ const Register: FC = () => {
 
   return (
     <div className={styles.main}>
+      <center>
       <h2>Register</h2>
+      </center>
+
+      <Card>
       <Form form={form} name="UserRegister" onFinish={onFinish}>
         <FormItem
           name="username"
@@ -138,7 +143,7 @@ const Register: FC = () => {
             },
           ]}
         >
-          <Input size="large" placeholder="please input username"/>
+          <Input size="large" placeholder="please input username" prefix={<UserOutlined className={styles.prefixIcon}/>}/>
         </FormItem>
         <Popover
           getPopupContainer={(node) => {
@@ -175,7 +180,7 @@ const Register: FC = () => {
               },
             ]}
           >
-            <Input size="large" type="password" placeholder="At least 6-digit password, case sensitive"/>
+            <Input size="large" type="password" placeholder="At least 6-digit password, case sensitive" prefix={<LockOutlined className={styles.prefixIcon}/>}/>
           </FormItem>
         </Popover>
         <FormItem
@@ -190,7 +195,7 @@ const Register: FC = () => {
             },
           ]}
         >
-          <Input size="large" type="password" placeholder="Confirm Password"/>
+          <Input size="large" type="password" placeholder="Confirm Password" prefix={<LockOutlined className={styles.prefixIcon}/>}/>
         </FormItem>
         <FormItem>
           <Button
@@ -207,6 +212,7 @@ const Register: FC = () => {
           </Link>
         </FormItem>
       </Form>
+      </Card>
     </div>
   );
 };

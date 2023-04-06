@@ -172,6 +172,21 @@ export const SupportPlatForm = {
   GC: { text: 'GC', value: 'GC' },
 };
 
+export const IndexMapping = {
+  index: { text: 'Index', value: 'index' },
+  set: { text: 'Set', value: 'set' },
+  type: { text: 'Type', value: 'type' },
+  position: { text: 'Position', value: 'position' },
+  sampleNo: { text: 'SampleNo', value: 'SampleNo' },
+  fileName: { text: 'FileName', value: 'fileName' },
+  injVol: { text: 'InjVol', value: 'injVol' },
+  path: { text: 'Path', value: 'path' },
+  dim1: { text: 'Dim1', value: 'dim1' },
+  dim2: { text: 'Dim2', value: 'dim2' },
+  dim3: { text: 'Dim3', value: 'dim3' },
+};
+
+
 export const DeviceType = {
   '6500+': { text: '6500+', value: '6500+' },
   "HF": { text: 'HF', value: 'HF' },
