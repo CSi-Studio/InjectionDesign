@@ -42,7 +42,8 @@ const Basic: FC = () => {
               </h3>
               <h3>
                 <b style={{color: "#e95420"}}>Step4: Worksheet </b><br/>
-                Users can download the sequence order of all plates in bulk directly from this page. Or you can download the order of individual plate one by one.
+                1. Users can set the corresponding field mapping table to meet the format requirements of different LC or MS instruments worksheet;<br/>
+                2. Users can download the sequence order of all plates in bulk directly from this page. Or you can download the order of individual plate one by one.<br/>
               </h3>
             </div>
           </Card>
