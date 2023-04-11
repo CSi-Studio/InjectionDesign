@@ -576,10 +576,11 @@ const ProjectDetail: React.FC = () => {
                                      setSelectedValues(values);
                                    }
                                  }}
-                                 renderText={({label}) => {
+                                 renderText={({label, index}) => {
                                    return (
                                      <div style={{fontSize: 12}}>
                                        <div>{label}</div>
+                                       <div>{index+1}</div>
                                      </div>
                                    );
                                  }}/>
