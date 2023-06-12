@@ -1,4 +1,3 @@
-
 import { defineConfig } from '@umijs/max';
 import defaultSettings from './defaultSettings';
 import routes from './routes';
@@ -38,9 +37,6 @@ export default defineConfig({
       },
     },
   },
-  history: {
-   type:'hash'
- },
 
   // umi routes: https://umijs.org/docs/routing
   routes,
