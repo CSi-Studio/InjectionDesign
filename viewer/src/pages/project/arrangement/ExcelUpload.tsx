@@ -105,9 +105,12 @@ export default (props: {
         },
 
         beforeUpload: (file) => {
+          console.log("file", file)
             const isExcel =
                 file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-                file.type === 'application/vnd.ms-excel';
+                file.type === 'application/vnd.ms-excel' ||
+                file.type === 'text/csv' ||
+                file.type === 'text/tsv';
             if (!isExcel) {
                 message.error(`${file.name} is not an excel file`);
             }

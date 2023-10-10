@@ -5,8 +5,8 @@ import routes from './routes';
 export default defineConfig({
   define: {
     // API_URL: 'http://192.168.1.91:8080'
-    API_URL: 'http://192.168.1.171:8086',
-    // API_URL: 'http://localhost:8080',
+    // API_URL: 'http://192.168.1.171:8080',
+    API_URL: 'http://localhost:8080/api',
     // API_URL: 'http://47.242.18.69:80',
   },
 

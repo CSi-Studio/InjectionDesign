@@ -201,7 +201,7 @@ export default {
   'or': '或',
   'drag.file.here': '将文件拖拽到此处',
   '1.upload.tip': '1. 请下载模板或导出成员信息，进行填写或修改',
-  '2.upload.tip': '2. 上传填好的文件，仅支持xls、xlsx格式',
+  '2.upload.tip': '2. 上传填好的文件，仅支持xls、xlsx、csv、tsv格式',
   'upload.error.tip': '文件中信息有误，请修改后重新上传',
   'check.errors': '查看全部错误内容',
   'upload.file.success.please.select': '文件上传成功，请选择',

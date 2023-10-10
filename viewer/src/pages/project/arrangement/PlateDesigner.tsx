@@ -106,19 +106,7 @@ const PlateDesign: React.FC = (props: any) => {
   }
 
   function Init() {
-    switch (props.plateType) {
-      case '1':
-        buildPlateType(9, 9, 50);
-        break;
-      case '2':
-        buildPlateType(8, 12, 50);
-        break;
-      case '3':
-        buildPlateType(16, 24, 28);
-        break;
-      default:
-        buildPlateType(8, 12, 40);
-    }
+    buildPlateType(props.plateRow, props.plateCol, props.wellSize);
     setYaxisFormat(props.plateNumber);
 
     let pCount: number | undefined;

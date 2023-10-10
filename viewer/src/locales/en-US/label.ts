@@ -204,7 +204,7 @@ export default {
   'or': 'or',
   'drag.file.here': 'drag file here',
   '1.upload.tip': '1. Please download the template or export the user list to update the information',
-  '2.upload.tip': '2. Upload the filled file. Only support for xls/xlsx',
+  '2.upload.tip': '2. Upload the filled file. Only support for xls/xlsx/csv/tsv',
   'upload.error.tip': 'The information in the file is incorrect, please modify it and upload it again',
   'check.errors': 'Check all the errors',
   'upload.file.success.please.select': 'File upload success, please select',

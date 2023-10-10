@@ -169,6 +169,11 @@ public abstract class ExcelManagerUtil<D extends BaseDO, Q extends PageQuery, S 
         EasyExcel.read(file.getInputStream(), clavv, this).sheet().doRead();
     }
 
+    public void importExcel(MultipartFile file, Consumer<V> action, ExcelTypeEnum excelTypeEnum) throws IOException {
+        this.action = action;
+        EasyExcel.read(file.getInputStream(), clavv, this).excelType(excelTypeEnum).sheet().doRead();
+    }
+
     public void importExcel(InputStream inputStream, Consumer<V> action) throws IOException {
         this.action = action;
         EasyExcel.read(inputStream, clavv, this).sheet().doRead();
