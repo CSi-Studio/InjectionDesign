@@ -6,4 +6,6 @@ public class FileConstants {
     public static final String XLSX = ".xlsx";
 
     public static final String CSV = ".csv";
+
+    public static final String TSV = ".tsv";
 }

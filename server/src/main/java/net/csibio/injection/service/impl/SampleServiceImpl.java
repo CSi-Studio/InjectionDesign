@@ -10,6 +10,7 @@ import net.csibio.injection.domain.query.SampleQuery;
 import net.csibio.injection.domain.vo.sample.SampleExcelErrorVO;
 import net.csibio.injection.domain.vo.sample.SampleExcelVO;
 import net.csibio.injection.dao.SampleDAO;
+import net.csibio.injection.domain.vo.sample.SampleTsvVO;
 import net.csibio.injection.exceptions.XException;
 import net.csibio.injection.service.IDAO;
 import net.csibio.injection.service.IProjectService;
@@ -80,6 +81,22 @@ public class SampleServiceImpl implements ISampleService {
         }
     }
 
+    @Override
+    public void checkBatchWithTsvVO(SampleTsvVO sampleTsvVO, List<SampleExcelErrorVO> errorMsgList) {
+        SampleExcelErrorVO sampleExcelErrorVO = new SampleExcelErrorVO();
+        if (ObjectUtils.isEmpty(sampleTsvVO)) {
+            String errorMsg = ResultCode.SAMPLE_LIST_IS_EMPTY.getMessage();
+            sampleExcelErrorVO.setErrorMsg(errorMsg);
+            errorMsgList.add(sampleExcelErrorVO);
+            return;
+        }
+        BeanUtils.copyProperties(sampleTsvVO, sampleExcelErrorVO);
+        if (StringUtils.isBlank(sampleTsvVO.getSampleId())) {
+            String errorMsg = ResultCode.SAMPLE_NO_CANNOT_BE_EMPTY.getMessage();
+            sampleExcelErrorVO.setErrorMsg(errorMsg);
+            errorMsgList.add(sampleExcelErrorVO);
+        }
+    }
     /**
      * 从excel中批量读取
      *
@@ -103,6 +120,28 @@ public class SampleServiceImpl implements ISampleService {
         // 样本导入
         try {
             sampleDAO.insert(sampleConverter.convertToSampleDO(projectDO, sampleExcelVO));
+        } catch (Exception e) {
+            log.error("insert sample db error, errorMsg:", e);
+            return;
+        }
+    }
+
+    @Override
+    public void saveBatchWithTsvVO(ProjectDO projectDO, SampleTsvVO sampleTsvVO, List<String> errorMsg) {
+        String errorKey = String.format("%s:", SAMPLE_EXCEL_ERROR_PREFIX);
+        if (StringUtils.isBlank(sampleTsvVO.getSampleId())) {
+            errorMsg.add(errorKey + ResultCode.SAMPLE_NO_CANNOT_BE_EMPTY.getMessage());
+            return;
+        }
+        // 判断样本是否存在
+        SampleDO sampleDO = sampleDAO.getBySampleNo(sampleTsvVO.getSampleId(), projectDO.getId());
+        if (sampleDO != null) {
+            log.info(String.format("sampleId:%s has been exist in projectId:%s", sampleTsvVO.getSampleId(), projectDO.getId()));
+            return;
+        }
+        // 样本导入
+        try {
+            sampleDAO.insert(sampleConverter.convertToSampleDO(projectDO, sampleTsvVO));
         } catch (Exception e) {
             log.error("insert sample db error, errorMsg:", e);
             return;

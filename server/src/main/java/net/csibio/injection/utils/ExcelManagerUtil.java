@@ -11,6 +11,7 @@ import net.csibio.injection.constants.*;
 import net.csibio.injection.domain.Result;
 import net.csibio.injection.domain.db.base.BaseDO;
 import net.csibio.injection.domain.query.PageQuery;
+import net.csibio.injection.domain.vo.sample.SampleTsvVO;
 import net.csibio.injection.service.BaseService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.io.ClassPathResource;
@@ -79,11 +80,9 @@ public abstract class ExcelManagerUtil<D extends BaseDO, Q extends PageQuery, S 
     public void exportExcel(HttpServletResponse response, Collection<V> vList, String fileNameStr, ExcelTypeEnum excelTypeEnum) throws Exception {
         if (Objects.equals(excelTypeEnum, ExcelTypeEnum.XLS)) {
             preExcelHandle(response, fileNameStr, FileConstants.XLS);
-        }
-        else if (Objects.equals(excelTypeEnum, ExcelTypeEnum.XLSX)) {
+        } else if (Objects.equals(excelTypeEnum, ExcelTypeEnum.XLSX)) {
             preExcelHandle(response, fileNameStr, FileConstants.XLSX);
-        }
-        else if (Objects.equals(excelTypeEnum, ExcelTypeEnum.CSV)) {
+        } else if (Objects.equals(excelTypeEnum, ExcelTypeEnum.CSV)) {
             preExcelHandle(response, fileNameStr, FileConstants.CSV);
         }
 
@@ -120,11 +119,9 @@ public abstract class ExcelManagerUtil<D extends BaseDO, Q extends PageQuery, S 
     public void exportExcel(HttpServletResponse response, Collection<V> vList, String fileNameStr, String templateFile, ExcelTypeEnum excelTypeEnum) throws Exception {
         if (Objects.equals(excelTypeEnum, ExcelTypeEnum.XLS)) {
             preExcelHandle(response, fileNameStr, FileConstants.XLS);
-        }
-        else if (Objects.equals(excelTypeEnum, ExcelTypeEnum.XLSX)) {
+        } else if (Objects.equals(excelTypeEnum, ExcelTypeEnum.XLSX)) {
             preExcelHandle(response, fileNameStr, FileConstants.XLSX);
-        }
-        else if (Objects.equals(excelTypeEnum, ExcelTypeEnum.CSV)) {
+        } else if (Objects.equals(excelTypeEnum, ExcelTypeEnum.CSV)) {
             preExcelHandle(response, fileNameStr, FileConstants.CSV);
         }
         InputStream templateInputStream = new ClassPathResource(templateFile).getInputStream();
@@ -166,7 +163,12 @@ public abstract class ExcelManagerUtil<D extends BaseDO, Q extends PageQuery, S 
      */
     public void importExcel(MultipartFile file, Consumer<V> action) throws IOException {
         this.action = action;
-        EasyExcel.read(file.getInputStream(), clavv, this).sheet().doRead();
+        switch (file.getContentType()) {
+            case ContentType.XLS, ContentType.XLSX ->
+                    EasyExcel.read(file.getInputStream(), clavv, this).sheet().doRead();
+            case ContentType.CSV ->
+                    EasyExcel.read(file.getInputStream(), clavv, this).excelType(ExcelTypeEnum.CSV).sheet().doRead();
+        }
     }
 
     public void importExcel(MultipartFile file, Consumer<V> action, ExcelTypeEnum excelTypeEnum) throws IOException {
