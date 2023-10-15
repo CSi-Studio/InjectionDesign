@@ -28,7 +28,7 @@ Users need to define the balance dimension and the randomization dimension separ
 All the final sequence will display with a visualized way and users can download the worksheet one by one all download all the worksheet at one time with the "Export All" button.
 
 
-# 0 Introduction
+# Installation
 This document outlines the step-by-step process for deploying the sample software application on the development server. The key software that will be installed includes:
 
 - Java Development Kit (JDK) 17
