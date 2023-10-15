@@ -86,15 +86,11 @@ java -jar /YOUR_PAHT/InjectionDesignDeploy.jar
 ```
 **Successful operation:** The following operations appear in the terminal to indicate that the operation is successful:
 
-```
-**Successful operation:** The following operations appear in the terminal to indicate that the operation is successful:
-
 ![image](https://github.com/CSi-Studio/InjectionDesign/assets/13608335/decc42f7-c557-43b3-bb2f-ce865376070a)
 
 Then, The InjectionDesign can be visit:  http://localhost:8080/
 
 Browsers support: Modern browsers and IE11: IE11, Edge, Firefox, Chrome, Safari, Opera
-
 
 ---
 
