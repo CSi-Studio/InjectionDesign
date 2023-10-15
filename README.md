@@ -80,15 +80,22 @@ Redis Installation Guide can be found [here](https://redis.io/docs/getting-start
    Installation packages can be downloaded at [https://drive.google.com/file/d/1r6LLSZkYDN4Jqt90SH988j5jezsAJa-l/view?usp=sharing
 ](https://drive.google.com/file/d/1r6LLSZkYDN4Jqt90SH988j5jezsAJa-l/view?usp=sharing)
 
+Open a terminal, Enter the following command
+```
 java -jar /YOUR_PAHT/InjectionDesignDeploy.jar
-
+```
 **Successful operation:** The following operations appear in the terminal to indicate that the operation is successful:
 
-![image.png](https://cdn.nlark.com/yuque/0/2023/png/22012470/1697376946384-765f3c73-3f4b-47e7-9230-0baf26e3fa32.png#averageHue=%230d0c0c&clientId=udbe58eee-894b-4&from=paste&height=484&id=u742af00e&originHeight=437&originWidth=668&originalType=url&ratio=1&rotation=0&showTitle=false&size=37245&status=done&style=none&taskId=u99b5d6aa-6e6c-4662-9934-15653bea502&title=&width=739.991455078125)
+```
+**Successful operation:** The following operations appear in the terminal to indicate that the operation is successful:
+
+![image](https://github.com/CSi-Studio/InjectionDesign/assets/13608335/decc42f7-c557-43b3-bb2f-ce865376070a)
 
 Then, The InjectionDesign can be visit:  http://localhost:8080/
 
 Browsers support: Modern browsers and IE11: IE11, Edge, Firefox, Chrome, Safari, Opera
+
+
 ---
 
 ## Demo
