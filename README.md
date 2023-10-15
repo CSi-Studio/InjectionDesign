@@ -53,12 +53,14 @@ The minimum and recommended system specifications are described in the following
 ## 1.2 Step by Step installation 
 ### 1.2.1 Install JDK
 JDK Installation Guide can be found [here](https://docs.oracle.com/en/java/javase/17/install/overview-jdk-installation.html#GUID-8677A77F-231A-40F7-98B9-1FD0B48C346A)
+
 **Successful operation:** The following operations appear in the terminal to indicate that the operation is successful:
 
 ![image.png](https://cdn.nlark.com/yuque/0/2023/png/22012470/1697376809098-9d9a8c15-eb0d-4d8b-9e41-f2a58f7887a4.png#averageHue=%23282623&clientId=udbe58eee-894b-4&from=paste&height=111&id=u29fdc4b8&originHeight=81&originWidth=530&originalType=binary&ratio=1&rotation=0&showTitle=false&size=7964&status=done&style=none&taskId=u7df84f5b-35e4-47ad-ad71-add666ae286&title=&width=727.8181762695312)
 ![image.png](https://cdn.nlark.com/yuque/0/2023/png/22012470/1697376776291-306b9454-115f-4706-8bd4-7d94b1eeef93.png#averageHue=%23222120&clientId=udbe58eee-894b-4&from=paste&height=621&id=u0004d9c2&originHeight=683&originWidth=1039&originalType=binary&ratio=1&rotation=0&showTitle=false&size=56413&status=done&style=none&taskId=u4837e214-de3b-4868-8151-a5a56f31ec8&title=&width=944.5454340729837)
 ### 1.2.2 Install Mongodb
 MongoDB installation Guide can be found [here](https://www.mongodb.com/docs/mongodb-shell/install/)
+
 **Successful operation:** The following operations appear in the terminal to indicate that the operation is successful:
 
 ![image.png](https://cdn.nlark.com/yuque/0/2023/png/22012470/1697376843263-3ac0b1c5-9909-42cc-8e4e-77df610d2294.png#averageHue=%23222120&clientId=udbe58eee-894b-4&from=paste&height=288&id=ucac1e577&originHeight=244&originWidth=607&originalType=binary&ratio=1&rotation=0&showTitle=false&size=15034&status=done&style=none&taskId=u388501cc-76b5-48a8-82cc-c5c7ea17cbf&title=&width=716.8181762695312)
