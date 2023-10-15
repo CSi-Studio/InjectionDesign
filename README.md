@@ -77,8 +77,18 @@ Redis Installation Guide can be found [here](https://redis.io/docs/getting-start
 | MongoDB | MongoDB 4.2(or above) | 27017 |
 
 ### 1.2.5 Run InjectionDesign 
-   Installation packages can be downloaded at 
+   Installation packages can be downloaded at [https://drive.google.com/file/d/1r6LLSZkYDN4Jqt90SH988j5jezsAJa-l/view?usp=sharing
+](https://drive.google.com/file/d/1r6LLSZkYDN4Jqt90SH988j5jezsAJa-l/view?usp=sharing)
 
+    Open a terminal, Enter the following command
+    ```
+    java -jar /YOUR_PAHT/InjectionDesignDeploy.jar
+   ```.
+**Successful operation:** The following operations appear in the terminal to indicate that the operation is successful:
+
+![image](https://github.com/CSi-Studio/InjectionDesign/assets/13608335/decc42f7-c557-43b3-bb2f-ce865376070a)
+
+Then, The InjectionDesign can be visit:  http://localhost:8080/
 
 Browsers support: Modern browsers and IE11: IE11, Edge, Firefox, Chrome, Safari, Opera
 
