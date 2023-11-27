@@ -233,6 +233,8 @@ public enum ResultCode implements Serializable {
     SAMPLE_LIST_IS_EMPTY("SAMPLE_LIST_IS_EMPTY", "样本列表为空"),
     UPLOAD_FILES_IS_NULL("UPLOAD_FILE_IS_NULL","上传样本数据为空"),
 
+    FILES_TYPE_IS_INCORRECT("UPLOAD_FILE_IS_NULL","样本文件类型错误"),
+
     /**
      * ********
      * pre order

@@ -1,13 +1,17 @@
 package net.csibio.injection.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import net.csibio.aird.constant.SymbolConst;
 import net.csibio.injection.constants.Constants;
+import net.csibio.injection.constants.ContentType;
+import net.csibio.injection.constants.FileConstants;
 import net.csibio.injection.constants.enums.ResultCode;
 import net.csibio.injection.constants.enums.UploadType;
 import net.csibio.injection.domain.Result;
 import net.csibio.injection.domain.db.ProjectDO;
 import net.csibio.injection.domain.db.SampleDO;
 import net.csibio.injection.domain.vo.sample.SampleExcelErrorVO;
+import net.csibio.injection.domain.vo.sample.SampleTsvVO;
 import net.csibio.injection.excel.SampleExcelManager;
 import net.csibio.injection.domain.query.SampleQuery;
 import net.csibio.injection.domain.vo.sample.SampleAddVO;
@@ -17,10 +21,13 @@ import net.csibio.injection.service.BaseService;
 import net.csibio.injection.service.IProjectService;
 import net.csibio.injection.service.ISampleService;
 import net.csibio.injection.utils.CommonUtil;
+import net.csibio.injection.utils.tsvparser.TSVParser;
+import net.csibio.injection.utils.tsvparser.TsvReader;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,8 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import static net.csibio.injection.constants.enums.ResultCode.PROJECT_NOT_EXISTED;
-import static net.csibio.injection.constants.enums.ResultCode.UPLOAD_FILES_IS_NULL;
+import static net.csibio.injection.constants.enums.ResultCode.*;
 
 @RestController
 @Slf4j
@@ -125,7 +131,7 @@ public class SampleController extends BaseController<SampleDO, SampleQuery> {
      */
     @RequestMapping(value = "/all")
     Result all(SampleQuery query) throws Exception {
-        if (query.getProjectId() == null){
+        if (query.getProjectId() == null) {
             return Result.OK();
         }
         query.setOrderBy(Sort.Direction.ASC);
@@ -194,9 +200,35 @@ public class SampleController extends BaseController<SampleDO, SampleQuery> {
         CommonUtil.checkIsNotNull(file, UPLOAD_FILES_IS_NULL);
         List<SampleExcelErrorVO> errorSampleList = Lists.newArrayList();
         try {
-            sampleExcelManager.importExcel(file, (vo) -> {
-                sampleService.checkBatchWithExcelVO(vo, errorSampleList);
-            });
+            String contentType = file.getContentType();
+            CommonUtil.checkIsNotNull(contentType, FILES_TYPE_IS_INCORRECT);
+            switch (contentType) {
+                case ContentType.XLS, ContentType.XLSX, ContentType.CSV ->
+                        sampleExcelManager.importExcel(file, (vo) -> {
+                            if(vo.areAllFieldsEmpty()){
+                                return;
+                            }
+                            sampleService.checkBatchWithExcelVO(vo, errorSampleList);
+                        });
+                default -> {
+                    String fileName = file.getOriginalFilename();
+                    //获取最后一个.的位置
+                    if (file.getOriginalFilename() == null) {
+                        break;
+                    }
+                    int lastIndexOf = fileName.lastIndexOf(SymbolConst.DOT);
+                    //获取图片的后缀名
+                    String suffix = fileName.substring(lastIndexOf);
+                    if (!ObjectUtils.isEmpty(file.getOriginalFilename()) && FileConstants.TSV.equals(suffix)) {
+                        TSVParser tsvParser = new TSVParser();
+                        tsvParser.parse(file,(vo)->{
+                            sampleService.checkBatchWithTsvVO(vo, errorSampleList);
+                        });
+                    }
+                }
+
+            }
+
         } catch (Exception e) {
             log.error("excel格式错误, msg:", e);
             return Result.Error("excel格式错误，请检查或下载模板后重试");
@@ -218,7 +250,7 @@ public class SampleController extends BaseController<SampleDO, SampleQuery> {
     Result uploadExcel(@RequestParam("file") MultipartFile file, @RequestParam(value = "projectId", required = false) String projectId, @RequestParam("uploadType") Integer uploadType, HttpServletRequest request) throws Exception {
         String token = request.getHeader(Constants.X_ACCESS_TOKEN);
         ProjectDO project = null;
-        if (projectId == null){
+        if (projectId == null) {
             project = new ProjectDO();
             String name = new SimpleDateFormat("yyyyMMdd-HHmmss").format(new Date());
             project.setName(name);
@@ -238,9 +270,33 @@ public class SampleController extends BaseController<SampleDO, SampleQuery> {
         }
         List<String> errorMsg = Lists.newArrayList();
         ProjectDO finalProject = project;
-        sampleExcelManager.importExcel(file, (vo) -> {
-            sampleService.saveBatchWithExcelVO(finalProject, vo, errorMsg);
-        });
+        String contentType = file.getContentType();
+        switch (contentType) {
+            case ContentType.XLS, ContentType.XLSX, ContentType.CSV ->
+                    sampleExcelManager.importExcel(file, (vo) -> {
+                        if(vo.areAllFieldsEmpty()){
+                            return;
+                        }
+                        sampleService.saveBatchWithExcelVO(finalProject, vo, errorMsg);
+                    });
+            default -> {
+                String fileName = file.getOriginalFilename();
+                //获取最后一个.的位置
+                if (file.getOriginalFilename() == null) {
+                    break;
+                }
+                int lastIndexOf = fileName.lastIndexOf(SymbolConst.DOT);
+                //获取图片的后缀名
+                String suffix = fileName.substring(lastIndexOf);
+                if (!ObjectUtils.isEmpty(file.getOriginalFilename()) && FileConstants.TSV.equals(suffix)) {
+                    TSVParser tsvParser = new TSVParser();
+                    tsvParser.parse(file, (vo) -> {
+                        sampleService.saveBatchWithTsvVO(finalProject, vo, errorMsg);
+                    });
+                }
+            }
+
+        }
         Result result = Result.OK(errorMsg);
         HashMap<String, String> map = new HashMap<>();
         map.put("projectId", projectId);

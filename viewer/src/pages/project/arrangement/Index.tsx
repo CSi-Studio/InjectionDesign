@@ -4,13 +4,20 @@ import {buildColumn} from '@/pages/project/arrangement/Column';
 import PreOrderService from '@/services/PreOrderService';
 import SampleService from '@/services/SampleService';
 import {url} from '@/utils/request';
-import {DeleteOutlined, DownloadOutlined, TabletFilled, UploadOutlined,} from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  DownloadOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  TabletFilled,
+  UploadOutlined,
+} from '@ant-design/icons';
 import {ProForm} from '@ant-design/pro-components';
 import type {ProFormInstance} from '@ant-design/pro-form';
 import {ProFormDigit} from '@ant-design/pro-form';
 import type {ActionType} from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import {Alert, Button, Card, Col, message, Modal, Row, Space, Steps,} from 'antd';
+import {Alert, Button, Card, Col, Divider, Input, InputNumber, message, Modal, Row, Space, Steps,} from 'antd';
 import type {Key} from 'react';
 import React, {useEffect, useRef, useState} from 'react';
 import {Direction, PlateNumber, PlateTypeEnum, SampleColors, QCTypeEnum} from '@/components/Enums/Const';
@@ -108,10 +115,12 @@ const ProjectDetail: React.FC = () => {
     setCurrent(value);
   };
 
-  const buildPlateType = (row: number, col: number, wSize: number) => {
+  const buildPlateType = (row: number, col: number, wSize: number, maxSampleSize: number) => {
     setPlateRow(row);
     setPlateCol(col);
-    setWellSize(wSize);
+    setWellSize(getPlateTotal() <= 96 ? 50 : 45);
+    setMaxSamplesOnSinglePlate(maxSampleSize)
+    setJudge(judge + 1)
   }
 
   const removeFromOther = (values: number[]) => {
@@ -135,6 +144,10 @@ const ProjectDetail: React.FC = () => {
     buildQCInfo(customQcPosition, blankQcPosition, ltrQcPosition, solventQcPosition, pooledQcPosition);
   }
 
+  const getPlateTotal = () => {
+    return  plateCol * plateRow;
+  }
+
   const getTotalCapacity = () => {
     return maxSamplesOnSinglePlate + pooledQcPosition.length + ltrQcPosition.length + solventQcPosition.length + customQcPosition.length + blankQcPosition.length
   }
@@ -145,35 +158,11 @@ const ProjectDetail: React.FC = () => {
 
   const judgeIfOutOfIndex = () => {
     setParamsSizeError(undefined);
-    switch (plateType) {
-      case "1":
-        if (getTotalCapacity() > 81) {
-          if (getCapacity() > 81) {
-            setParamsSizeError("Max Samples Count + QC Count must <= 81");
-          } else {
-            setMaxSamplesOnSinglePlate(81 - getCapacity());
-          }
-        }
-        break;
-      case "2":
-        if (getTotalCapacity() > 96) {
-          if (getCapacity() > 96) {
-            setParamsSizeError("Max Samples Count + QC Count must <= 96");
-          } else {
-            setMaxSamplesOnSinglePlate(96 - getCapacity());
-          }
-
-        }
-        break;
-      case "3":
-        if (getTotalCapacity() > 384) {
-          if (getCapacity() > 384) {
-            setParamsSizeError("Max Samples Count + QC Count must <= 384");
-          } else {
-            setMaxSamplesOnSinglePlate(384 - getCapacity());
-          }
-        }
-        break;
+    const plateTotal = plateRow * plateCol;
+    if (getTotalCapacity() > plateTotal) {
+      setParamsSizeError("Max Samples Count + QC Count has exceeded the maximum limit");
+    } else {
+      setMaxSamplesOnSinglePlate(plateTotal - getCapacity());
     }
   }
 
@@ -471,7 +460,14 @@ const ProjectDetail: React.FC = () => {
       content: <Card>
         <Row gutter={[5, 5]}>
           <Col span={6}>
-            <Card title={"Define Generate Params"}>
+            <Card title={"Define Generate Params"}
+                  extra={
+                    <ReloadOutlined
+                      onClick={() => {
+                        buildPlateType(8, 12, 55, 96);
+                      }}
+                      style={{fontSize: 16, color: '#1890ff'}}
+                    />}>
               <Row>
                 <Col span={24}>
                   {paramsSizeError !== undefined ?
@@ -501,27 +497,29 @@ const ProjectDetail: React.FC = () => {
                       plateType,
                     }}>
                     <ProForm.Group>
-                      <ProFormSelect rules={[{required: true, message: 'required'}]} width={150} name="plateType"
-                                     label={"Plate"} valueEnum={PlateTypeEnum}
-                                     fieldProps={{
-                                       onSelect: function (label: string) {
-                                         switch (label) {
-                                           case "1":
-                                             buildPlateType(9, 9, 60);
-                                             break;
-                                           case "2":
-                                             buildPlateType(8, 12, 55);
-                                             break;
-                                           case "3":
-                                             buildPlateType(16, 24, 32);
-                                             break;
-                                           default:
-                                             buildPlateType(8, 12, 60);
-                                         }
-                                         buildQCInfo([], [], [], [], []);
-                                       }
-                                     }}
-                      />
+                      <Space>
+                        <ProFormDigit rules={[{required: true, message: 'required'}]} width={75}
+                                      name="row" min={1} label={"Plate row"}
+                                      tooltip={"81(9*9) " +
+                                        " 96(8*12) " +
+                                        " 384(16*24)"}
+                                      fieldProps={{
+                                        value: plateRow,
+                                        onChange: (value: any) => {
+                                          setPlateRow(value);
+                                        }
+                                      }}
+                        />
+                        <ProFormDigit rules={[{required: true, message: 'required'}]} width={75}
+                                      name="col" min={1} label={"Plate col"} max={20}
+                                      fieldProps={{
+                                        value: plateCol,
+                                        onChange: (value: any) => {
+                                          setPlateCol(value);
+                                        }
+                                      }}
+                        />
+                      </Space>
                       <ProFormDigit rules={[{required: true, message: 'required'}]} width={150}
                                     name="maxSamplesOnSinglePlate" min={1} label={"Max Samples on Single Plate"}
                                     fieldProps={{
@@ -580,7 +578,7 @@ const ProjectDetail: React.FC = () => {
                                    return (
                                      <div style={{fontSize: 12}}>
                                        <div>{label}</div>
-                                       <div>{index+1}</div>
+                                       <div>{index + 1}</div>
                                      </div>
                                    );
                                  }}/>
@@ -634,6 +632,7 @@ const ProjectDetail: React.FC = () => {
       title: "Randomization",
       //@ts-ignore
       content: <PlateDesign plateType={plateType} maxSamplesOnSinglePlate={maxSamplesOnSinglePlate}
+                            plateRow={plateRow} plateCol={plateCol} wellSize={wellSize}
                             plateNumber={plateNumber} dimRes={[dim1Sample, dim2Sample, dim3Sample]}
                             customQcPosition={customQcPosition}
                             blankQcPosition={blankQcPosition}

@@ -92,7 +92,7 @@ export default (props: {
         name: 'file',
         action: props.actionUrl,
         method: 'POST',
-        accept: '.xls,.xlsx',
+        accept: '.xls,.xlsx,.csv,.tsv',
         maxCount: 1,
         headers: {
             'X-Access-Token': '',
@@ -105,11 +105,19 @@ export default (props: {
         },
 
         beforeUpload: (file) => {
-            const isExcel =
+          console.log("file", file)
+          let lastIndexOf = file.name.lastIndexOf(".");
+          //获取图片的后缀名
+          const suffix = file.name.substring(lastIndexOf);
+          console.log(suffix)
+          const isExcel =
                 file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-                file.type === 'application/vnd.ms-excel';
+                file.type === 'application/vnd.ms-excel' ||
+                file.type === 'text/csv' ||
+                suffix.indexOf(".tsv") != -1;
             if (!isExcel) {
-                message.error(`${file.name} is not an excel file`);
+                message.error(`${file.name} is not an excel or csv/tsv type file`);
+                return;
             }
             return isExcel || Upload.LIST_IGNORE;
         },
